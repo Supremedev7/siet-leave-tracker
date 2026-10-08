@@ -1,12 +1,19 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import SIETLoadingScreen from "@/components/ui/LoadingScreen";
 import Login from "@/pages/auth/Login";
 import Signup from "@/pages/auth/Signup";
 import StudentDashboard from "@/pages/student/StudentDashboard";
 import ApplyLeave from "@/pages/student/ApplyLeave";
+import MyLeaves from "@/pages/student/MyLeaves";
+import StudentProfile from "@/pages/student/Profile";
 import HodDashboard from "@/pages/hod/HodDashboard";
 import Approvals from "@/pages/hod/Approvals";
+import AllRequests from "@/pages/hod/AllRequests";
+import HodProfile from "@/pages/hod/Profile";
+import PageTransition from "@/components/ui/PageTransition";
+import Landing from "@/pages/Landing";
 
 const ProtectedRoute: React.FC<{
   children: React.ReactNode;
@@ -14,14 +21,14 @@ const ProtectedRoute: React.FC<{
 }> = ({ children, allowedRole }) => {
   const { user, userData, loading } = useAuth();
 
-  if (loading) return <div className="h-screen w-screen flex items-center justify-center">Loading...</div>;
+  if (loading) return <SIETLoadingScreen />;
 
   if (!user || !userData) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   if (allowedRole && userData.role !== allowedRole) {
-    return <Navigate to={`/${userData.role}/dashboard`} />;
+    return <Navigate to={`/${userData.role}/dashboard`} replace />;
   }
 
   return <>{children}</>;
@@ -31,16 +38,23 @@ export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        
-        {/* Student Routes */}
-        <Route path="/student" element={<Navigate to="/student/dashboard" />} />
+        {/* Landing Page */}
+        <Route path="/" element={<PageTransition><Landing /></PageTransition>} />
+        <Route path="/landing" element={<PageTransition><Landing /></PageTransition>} />
+
+        {/* Auth */}
+        <Route path="/login"  element={<PageTransition><Login /></PageTransition>} />
+        <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
+
+        {/* ── Student Routes ── */}
+        <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
         <Route
           path="/student/dashboard"
           element={
             <ProtectedRoute allowedRole="student">
-              <StudentDashboard />
+              <PageTransition>
+                <StudentDashboard />
+              </PageTransition>
             </ProtectedRoute>
           }
         />
@@ -48,18 +62,42 @@ export const AppRouter = () => {
           path="/student/apply"
           element={
             <ProtectedRoute allowedRole="student">
-              <ApplyLeave />
+              <PageTransition>
+                <ApplyLeave />
+              </PageTransition>
             </ProtectedRoute>
           }
         />
-        
-        {/* HOD Routes */}
-        <Route path="/hod" element={<Navigate to="/hod/dashboard" />} />
+        <Route
+          path="/student/leaves"
+          element={
+            <ProtectedRoute allowedRole="student">
+              <PageTransition>
+                <MyLeaves />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/profile"
+          element={
+            <ProtectedRoute allowedRole="student">
+              <PageTransition>
+                <StudentProfile />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ── HOD Routes ── */}
+        <Route path="/hod" element={<Navigate to="/hod/dashboard" replace />} />
         <Route
           path="/hod/dashboard"
           element={
             <ProtectedRoute allowedRole="hod">
-              <HodDashboard />
+              <PageTransition>
+                <HodDashboard />
+              </PageTransition>
             </ProtectedRoute>
           }
         />
@@ -67,12 +105,35 @@ export const AppRouter = () => {
           path="/hod/approvals"
           element={
             <ProtectedRoute allowedRole="hod">
-              <Approvals />
+              <PageTransition>
+                <Approvals />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hod/all-requests"
+          element={
+            <ProtectedRoute allowedRole="hod">
+              <PageTransition>
+                <AllRequests />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hod/profile"
+          element={
+            <ProtectedRoute allowedRole="hod">
+              <PageTransition>
+                <HodProfile />
+              </PageTransition>
             </ProtectedRoute>
           }
         />
 
-        <Route path="*" element={<Navigate to="/login" />} />
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
