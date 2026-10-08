@@ -1,5 +1,42 @@
-# Logs
-logs
+# ==========================================
+# SIET Leave Tracker - Comprehensive .gitignore
+# ==========================================
+
+# Environment & Secret Variables (CRITICAL)
+.env
+.env.*
+!.env.example
+*.env
+*.env.local
+
+# API Keys, Secrets & Certificates
+*serviceAccount*.json
+*firebase-adminsdk*.json
+*-adminsdk-*.json
+credentials*.json
+client_secret*.json
+secrets/
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.token
+id_rsa*
+id_ed25519*
+
+# Firebase & Cloud Tooling Artifacts
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Vercel Deployment & Cache
+.vercel/
+
+# Logs & Diagnostics
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,27 +44,45 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Node Dependencies
+node_modules/
+.pnp
+.pnp.js
 
-# Editor directories and files
+# Build Outputs & Bundles
+dist/
+dist-ssr/
+build/
+out/
+*.tsbuildinfo
+.eslintcache
+.parcel-cache
+.turbo/
+
+# Testing & Headless Verification Artifacts
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+.playwright-mcp/
+
+# OS-Specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor Configurations
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-# env files
-.env
-.env.*
-!.env.example
-
-# Build info and testing artifacts
-*.tsbuildinfo
-.playwright-mcp/
+*.sublime-project
+*.sublime-workspace
