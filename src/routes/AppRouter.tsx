@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserRole } from "@/types/leave";
 import SIETLoadingScreen from "@/components/ui/LoadingScreen";
 import Login from "@/pages/auth/Login";
 import Signup from "@/pages/auth/Signup";
@@ -8,16 +9,26 @@ import StudentDashboard from "@/pages/student/StudentDashboard";
 import ApplyLeave from "@/pages/student/ApplyLeave";
 import MyLeaves from "@/pages/student/MyLeaves";
 import StudentProfile from "@/pages/student/Profile";
+import FacultyDashboard from "@/pages/faculty/FacultyDashboard";
+import FacultyApprovals from "@/pages/faculty/FacultyApprovals";
+import FacultyHistory from "@/pages/faculty/FacultyHistory";
+import FacultyProfile from "@/pages/faculty/FacultyProfile";
 import HodDashboard from "@/pages/hod/HodDashboard";
 import Approvals from "@/pages/hod/Approvals";
 import AllRequests from "@/pages/hod/AllRequests";
+import FacultyManagement from "@/pages/hod/FacultyManagement";
 import HodProfile from "@/pages/hod/Profile";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminApprovals from "@/pages/admin/AdminApprovals";
+import AdminAllRequests from "@/pages/admin/AdminAllRequests";
+import AdminManageUsers from "@/pages/admin/AdminManageUsers";
+import AdminProfile from "@/pages/admin/AdminProfile";
 import PageTransition from "@/components/ui/PageTransition";
 import Landing from "@/pages/Landing";
 
 const ProtectedRoute: React.FC<{
   children: React.ReactNode;
-  allowedRole?: "student" | "hod";
+  allowedRole?: UserRole;
 }> = ({ children, allowedRole }) => {
   const { user, userData, loading } = useAuth();
 
@@ -89,6 +100,49 @@ export const AppRouter = () => {
           }
         />
 
+        {/* ── Faculty Routes ── */}
+        <Route path="/faculty" element={<Navigate to="/faculty/dashboard" replace />} />
+        <Route
+          path="/faculty/dashboard"
+          element={
+            <ProtectedRoute allowedRole="faculty">
+              <PageTransition>
+                <FacultyDashboard />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/approvals"
+          element={
+            <ProtectedRoute allowedRole="faculty">
+              <PageTransition>
+                <FacultyApprovals />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/history"
+          element={
+            <ProtectedRoute allowedRole="faculty">
+              <PageTransition>
+                <FacultyHistory />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/profile"
+          element={
+            <ProtectedRoute allowedRole="faculty">
+              <PageTransition>
+                <FacultyProfile />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+
         {/* ── HOD Routes ── */}
         <Route path="/hod" element={<Navigate to="/hod/dashboard" replace />} />
         <Route
@@ -122,11 +176,74 @@ export const AppRouter = () => {
           }
         />
         <Route
+          path="/hod/faculty"
+          element={
+            <ProtectedRoute allowedRole="hod">
+              <PageTransition>
+                <FacultyManagement />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/hod/profile"
           element={
             <ProtectedRoute allowedRole="hod">
               <PageTransition>
                 <HodProfile />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ── Admin Routes ── */}
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <PageTransition>
+                <AdminDashboard />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/approvals"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <PageTransition>
+                <AdminApprovals />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/all-requests"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <PageTransition>
+                <AdminAllRequests />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-users"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <PageTransition>
+                <AdminManageUsers />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <PageTransition>
+                <AdminProfile />
               </PageTransition>
             </ProtectedRoute>
           }
@@ -138,3 +255,5 @@ export const AppRouter = () => {
     </BrowserRouter>
   );
 };
+
+export default AppRouter;
