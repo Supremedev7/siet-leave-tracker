@@ -20,7 +20,6 @@ import {
   Printer,
   Ban,
   Clock,
-  AlertTriangle,
   FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusTag } from "@/components/ui/StatusTag";
 import LeaveCertificate from "@/components/student/LeaveCertificate";
+import { LeaveAuditStepper } from "@/components/leave/LeaveAuditStepper";
 import { toast } from "sonner";
 
 interface LeaveRecord {
@@ -37,10 +37,15 @@ interface LeaveRecord {
   startDate: any;
   endDate: any;
   totalDays?: number;
-  status: "pending" | "approved" | "rejected" | "cancelled";
+  status: string;
   createdAt: any;
   updatedAt?: any;
   hodRemarks?: string;
+  facultyRemarks?: string;
+  adminRemarks?: string;
+  currentApprover?: string;
+  finalAuthority?: string;
+  approvalChain?: any[];
   emergencyPhone?: string;
   attachmentUrl?: string;
   studentName: string;
@@ -144,7 +149,10 @@ export default function MyLeaves() {
 
   const filteredLeaves = leaves.filter((leave) => {
     const matchesStatus =
-      statusFilter === "all" || leave.status === statusFilter;
+      statusFilter === "all" ||
+      (statusFilter === "pending"
+        ? leave.status.startsWith("pending")
+        : leave.status === statusFilter);
     const matchesSearch =
       searchQuery.trim() === "" ||
       leave.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -154,7 +162,7 @@ export default function MyLeaves() {
 
   const countByStatus = {
     all: leaves.length,
-    pending: leaves.filter((l) => l.status === "pending").length,
+    pending: leaves.filter((l) => l.status.startsWith("pending")).length,
     approved: leaves.filter((l) => l.status === "approved").length,
     rejected: leaves.filter((l) => l.status === "rejected").length,
   };
@@ -324,18 +332,10 @@ export default function MyLeaves() {
                       </p>
                     </div>
 
-                    {/* Rejection Remarks from HOD */}
-                    {leave.status === "rejected" && leave.hodRemarks && (
-                      <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200/80 dark:border-red-900/40 space-y-1">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-red-800 dark:text-red-300">
-                          <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
-                          HOD Rejection Remarks
-                        </div>
-                        <p className="text-xs text-red-700 dark:text-red-400 leading-relaxed">
-                          {leave.hodRemarks}
-                        </p>
-                      </div>
-                    )}
+                    {/* Multi-Tier Visual Audit Progress Stepper */}
+                    <div className="pt-1">
+                      <LeaveAuditStepper leave={leave as any} />
+                    </div>
                   </div>
                 </div>
 
@@ -346,7 +346,7 @@ export default function MyLeaves() {
                   </span>
 
                   <div className="flex items-center gap-2">
-                    {leave.status === "pending" && (
+                    {(leave.status === "pending_faculty" || leave.status === "pending") && (
                       <Button
                         size="sm"
                         variant="outline"

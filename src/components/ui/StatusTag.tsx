@@ -48,6 +48,33 @@ export const StatusTag: React.FC<StatusTagProps> = ({
           Cancelled
         </span>
       );
+    case "pending_faculty":
+      return (
+        <span
+          className={`inline-flex items-center font-semibold tracking-wide border border-amber-300/80 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0 animate-pulse" />
+          Pending Advisor
+        </span>
+      );
+    case "pending_hod":
+      return (
+        <span
+          className={`inline-flex items-center font-semibold tracking-wide border border-blue-300/80 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400 flex-shrink-0 animate-pulse" />
+          Pending HOD
+        </span>
+      );
+    case "pending_admin":
+      return (
+        <span
+          className={`inline-flex items-center font-semibold tracking-wide border border-purple-300/80 dark:border-purple-800/60 bg-purple-50/70 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-purple-500 dark:bg-purple-400 flex-shrink-0 animate-pulse" />
+          Pending Principal
+        </span>
+      );
     case "pending":
     default:
       return (

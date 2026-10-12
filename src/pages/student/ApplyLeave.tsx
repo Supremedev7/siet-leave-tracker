@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { getFinalAuthority } from "@/lib/escalation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -118,6 +119,8 @@ export default function ApplyLeave() {
       const startObj = new Date(values.startDate);
       const endObj = new Date(values.endDate);
 
+      const finalAuth = getFinalAuthority(totalDays || 1);
+
       await addDoc(collection(db, "leaveRequests"), {
         type: values.type,
         reason: values.reason,
@@ -132,13 +135,16 @@ export default function ApplyLeave() {
         department: userData.department,
         year: userData.year || 1,
         section: userData.section || "A",
-        status: "pending",
+        status: "pending_faculty",
+        currentApprover: "faculty",
+        finalAuthority: finalAuth,
+        approvalChain: [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
 
       toast.success("Leave application submitted successfully!", {
-        description: `Your ${values.type} request has been routed to the ${userData.department} HOD.`,
+        description: `Your ${values.type} request (${totalDays}d) is routed to your Class Advisor (${userData.department} Y${userData.year}-${userData.section}).`,
       });
 
       navigate("/student/leaves");
@@ -372,7 +378,7 @@ export default function ApplyLeave() {
                       ) : (
                         <>
                           <Send className="h-4 w-4" />
-                          Submit to Department HOD
+                          Submit Application
                         </>
                       )}
                     </Button>
@@ -384,6 +390,30 @@ export default function ApplyLeave() {
 
           {/* Right Sidebar: Rules & Guidelines */}
           <div className="space-y-4">
+            {/* Approval Hierarchy Card */}
+            <Card className="border-border/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground dark:text-zinc-100">
+                  <Info className="h-4 w-4 text-siet-primary dark:text-red-400" />
+                  Approval Hierarchy Matrix
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2.5 text-xs text-muted-foreground dark:text-zinc-400">
+                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+                  <p className="font-bold text-foreground">1 – 2 Days Leave</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Decided directly by your assigned Class Advisor.</p>
+                </div>
+                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+                  <p className="font-bold text-foreground">3 – 5 Days Leave</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Class Advisor recommends &amp; forwards to Department HOD.</p>
+                </div>
+                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+                  <p className="font-bold text-foreground">6+ Days Leave</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Class Advisor → HOD Endorsement → Principal Clearance.</p>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="border-border/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground dark:text-zinc-100">
