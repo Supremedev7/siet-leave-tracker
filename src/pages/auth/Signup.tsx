@@ -36,7 +36,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const signupSchema = z
   .object({
-    role: z.enum(["student", "hod"]),
+    role: z.enum(["student", "faculty", "hod"]),
     email: z
       .string()
       .email("Valid email required")
@@ -57,7 +57,7 @@ const signupSchema = z
     semester: z.string().optional(),
     section: z.string().optional(),
 
-    // HOD specific
+    // Faculty & HOD specific
     employeeId: z.string().optional(),
   })
   .superRefine((data, ctx) => {
@@ -95,6 +95,28 @@ const signupSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Select section",
+          path: ["section"],
+        });
+      }
+    } else if (data.role === "faculty") {
+      if (!data.employeeId || data.employeeId.trim().length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Employee ID is required for faculty",
+          path: ["employeeId"],
+        });
+      }
+      if (!data.year) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Select assigned class year",
+          path: ["year"],
+        });
+      }
+      if (!data.section) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Select assigned class section",
           path: ["section"],
         });
       }
@@ -164,6 +186,11 @@ export default function Signup() {
         userData.year = values.year ? Number(values.year) : 1;
         userData.semester = values.semester ? Number(values.semester) : 1;
         userData.section = values.section?.toUpperCase().trim() || "A";
+      } else if (values.role === "faculty") {
+        userData.employeeId = values.employeeId?.toUpperCase().trim();
+        userData.assignedYear = values.year ? Number(values.year) : 1;
+        userData.assignedSection = values.section?.toUpperCase().trim() || "A";
+        userData.designation = "Class Advisor";
       } else {
         userData.employeeId = values.employeeId?.toUpperCase().trim();
       }
@@ -256,6 +283,7 @@ export default function Signup() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="student">Student</SelectItem>
+                          <SelectItem value="faculty">Faculty (Class Advisor)</SelectItem>
                           <SelectItem value="hod">Head of Department (HOD)</SelectItem>
                         </SelectContent>
                       </Select>
@@ -443,6 +471,87 @@ export default function Signup() {
                         )}
                       />
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Faculty Specific Fields */}
+              {selectedRole === "faculty" && (
+                <div className="p-3.5 bg-muted/30 border border-border/80 rounded-2xl space-y-3">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-siet-primary flex items-center gap-1.5">
+                    <GraduationCap className="h-3.5 w-3.5" />
+                    Class Advisory Assignment
+                  </p>
+                  <FormField
+                    control={form.control}
+                    name="employeeId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-bold text-muted-foreground uppercase">
+                          Faculty Employee ID
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. FAC-CSE-102"
+                            className="h-9 text-xs bg-white border-border uppercase"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[11px] font-bold text-muted-foreground uppercase">
+                            Assigned Year
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-9 text-xs bg-white border-border">
+                                <SelectValue placeholder="Year" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="1">1st Year</SelectItem>
+                              <SelectItem value="2">2nd Year</SelectItem>
+                              <SelectItem value="3">3rd Year</SelectItem>
+                              <SelectItem value="4">4th Year</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-[11px]" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="section"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[11px] font-bold text-muted-foreground uppercase">
+                            Assigned Section
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-9 text-xs bg-white border-border">
+                                <SelectValue placeholder="Sec" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="A">A</SelectItem>
+                              <SelectItem value="B">B</SelectItem>
+                              <SelectItem value="C">C</SelectItem>
+                              <SelectItem value="D">D</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-[11px]" />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </div>
               )}
