@@ -27,8 +27,7 @@ export const TopMasthead: React.FC = () => {
     }
   };
 
-  const dashboardRoute =
-    userData?.role === "hod" ? "/hod/dashboard" : "/student/dashboard";
+  const dashboardRoute = `/${userData?.role || "student"}/dashboard`;
 
   return (
     <header className="w-full bg-white dark:bg-zinc-900 border-b border-zinc-200/90 dark:border-zinc-800 relative z-40 select-none transition-colors">
@@ -86,8 +85,12 @@ export const TopMasthead: React.FC = () => {
                   {userData?.name || "Academic User"}
                 </p>
                 <p className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 font-medium">
-                  {userData?.role === "hod"
+                  {userData?.role === "admin"
+                    ? "Principal / Admin"
+                    : userData?.role === "hod"
                     ? `HOD • ${userData?.department}`
+                    : userData?.role === "faculty"
+                    ? `Advisor • ${userData?.department} Y${userData?.assignedYear || 1}-${userData?.assignedSection || "A"}`
                     : `${userData?.rollNumber || "Student"}`}
                 </p>
               </div>
@@ -111,17 +114,19 @@ export const TopMasthead: React.FC = () => {
                       {userData?.email}
                     </p>
                     <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-siet-primary/10 dark:bg-red-500/10 text-siet-primary dark:text-red-400 rounded font-mono">
-                      {userData?.role === "hod" ? "Department Head" : "Student"}
+                      {userData?.role === "admin"
+                        ? "Central Administrator"
+                        : userData?.role === "hod"
+                        ? "Department Head"
+                        : userData?.role === "faculty"
+                        ? "Class Advisor"
+                        : "Student"}
                     </span>
                   </div>
 
                   <div className="py-1">
                     <Link
-                      to={
-                        userData?.role === "hod"
-                          ? "/hod/profile"
-                          : "/student/profile"
-                      }
+                      to={`/${userData?.role || "student"}/profile`}
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/70 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     >

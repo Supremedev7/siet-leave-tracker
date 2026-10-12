@@ -27,6 +27,7 @@ import {
   CheckCheck,
   Phone,
   Paperclip,
+  Forward,
 } from "lucide-react";
 import {
   Table,
@@ -37,26 +38,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-
-interface LeaveRequest {
-  id: string;
-  studentUid: string;
-  studentName: string;
-  rollNumber: string;
-  department: string;
-  year: number | string;
-  section: string;
-  type: string;
-  startDate: any;
-  endDate: any;
-  totalDays?: number;
-  reason: string;
-  emergencyPhone?: string;
-  attachmentUrl?: string;
-  status: "pending" | "approved" | "rejected";
-  createdAt: any;
-  hodRemarks?: string;
-}
+import { LeaveRequest, ApprovalChainEntry } from "@/types/leave";
+import { canHodApproveDirectly } from "@/lib/escalation";
+import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
 
 const safeFormatDate = (dateVal: any, pattern = "dd MMM yyyy"): string => {
   if (!dateVal) return "—";
@@ -88,6 +72,7 @@ export default function Approvals() {
   const [selectedLeave, setSelectedLeave] = useState<LeaveRequest | null>(null);
   const [rejectingLeave, setRejectingLeave] = useState<LeaveRequest | null>(null);
   const [rejectionRemark, setRejectionRemark] = useState("");
+  const [hodRemarksInput, setHodRemarksInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -98,7 +83,7 @@ export default function Approvals() {
     const q = query(
       collection(db, "leaveRequests"),
       where("department", "==", userData.department),
-      where("status", "==", "pending")
+      where("status", "in", ["pending_hod", "pending"])
     );
 
     const unsubscribe = onSnapshot(
@@ -130,14 +115,28 @@ export default function Approvals() {
   }, [userData]);
 
   const handleApprove = async (leave: LeaveRequest) => {
+    if (!userData) return;
     setIsProcessing(true);
     try {
       const leaveRef = doc(db, "leaveRequests", leave.id);
+      const chainEntry: ApprovalChainEntry = {
+        stage: "hod",
+        action: "approved",
+        approverUid: userData.uid,
+        approverName: userData.name,
+        approverRole: "hod",
+        remarks: hodRemarksInput.trim() || "Approved by HOD",
+        timestamp: new Date(),
+      };
+
       await updateDoc(leaveRef, {
         status: "approved",
+        currentApprover: "completed",
+        hodRemarks: hodRemarksInput.trim() || "Approved by HOD",
+        approvalChain: [...(leave.approvalChain || []), chainEntry],
         updatedAt: serverTimestamp(),
-        approvedBy: userData?.uid,
-        approverName: userData?.name,
+        approvedBy: userData.uid,
+        approverName: userData.name,
       });
 
       toast.success(`Leave approved for ${leave.studentName}`, {
@@ -145,7 +144,10 @@ export default function Approvals() {
       });
 
       setSelectedIds((prev) => prev.filter((id) => id !== leave.id));
-      if (selectedLeave?.id === leave.id) setSelectedLeave(null);
+      if (selectedLeave?.id === leave.id) {
+        setSelectedLeave(null);
+        setHodRemarksInput("");
+      }
     } catch (error: any) {
       console.error("Error approving leave:", error);
       toast.error("Failed to approve leave request", { description: error.message });
@@ -154,9 +156,49 @@ export default function Approvals() {
     }
   };
 
+  const handleForwardToAdmin = async (leave: LeaveRequest) => {
+    if (!userData) return;
+    setIsProcessing(true);
+    try {
+      const leaveRef = doc(db, "leaveRequests", leave.id);
+      const chainEntry: ApprovalChainEntry = {
+        stage: "hod",
+        action: "forwarded",
+        approverUid: userData.uid,
+        approverName: userData.name,
+        approverRole: "hod",
+        remarks: hodRemarksInput.trim() || "Endorsed by HOD for Principal approval",
+        timestamp: new Date(),
+      };
+
+      await updateDoc(leaveRef, {
+        status: "pending_admin",
+        currentApprover: "admin",
+        hodRemarks: hodRemarksInput.trim() || "Endorsed by HOD",
+        approvalChain: [...(leave.approvalChain || []), chainEntry],
+        updatedAt: serverTimestamp(),
+      });
+
+      toast.success(`Endorsed and forwarded to Principal for ${leave.studentName}`, {
+        description: `Extended leave (${leave.totalDays} days) requires institutional clearance.`,
+      });
+
+      setSelectedIds((prev) => prev.filter((id) => id !== leave.id));
+      if (selectedLeave?.id === leave.id) {
+        setSelectedLeave(null);
+        setHodRemarksInput("");
+      }
+    } catch (error: any) {
+      console.error("Error forwarding leave:", error);
+      toast.error("Failed to forward leave request", { description: error.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleRejectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rejectingLeave) return;
+    if (!rejectingLeave || !userData) return;
 
     if (!rejectionRemark.trim()) {
       toast.error("Please provide a reason for rejection");
@@ -166,12 +208,24 @@ export default function Approvals() {
     setIsProcessing(true);
     try {
       const leaveRef = doc(db, "leaveRequests", rejectingLeave.id);
+      const chainEntry: ApprovalChainEntry = {
+        stage: "hod",
+        action: "rejected",
+        approverUid: userData.uid,
+        approverName: userData.name,
+        approverRole: "hod",
+        remarks: rejectionRemark.trim(),
+        timestamp: new Date(),
+      };
+
       await updateDoc(leaveRef, {
         status: "rejected",
+        currentApprover: "completed",
         hodRemarks: rejectionRemark.trim(),
+        approvalChain: [...(rejectingLeave.approvalChain || []), chainEntry],
         updatedAt: serverTimestamp(),
-        rejectedBy: userData?.uid,
-        approverName: userData?.name,
+        rejectedBy: userData.uid,
+        approverName: userData.name,
       });
 
       toast.error(`Leave rejected for ${rejectingLeave.studentName}`, {
@@ -191,24 +245,59 @@ export default function Approvals() {
   };
 
   const handleBulkApprove = async () => {
-    if (selectedIds.length === 0) return;
-    if (!confirm(`Are you sure you want to approve all ${selectedIds.length} selected leave requests?`)) {
+    if (selectedIds.length === 0 || !userData) return;
+    if (!confirm(`Are you sure you want to process all ${selectedIds.length} selected leave requests?`)) {
       return;
     }
 
     setIsProcessing(true);
     try {
       for (const id of selectedIds) {
+        const leave = leaves.find((l) => l.id === id);
+        if (!leave) continue;
+        const canDirectApprove = canHodApproveDirectly(leave.totalDays || 1);
         const leaveRef = doc(db, "leaveRequests", id);
-        await updateDoc(leaveRef, {
-          status: "approved",
-          updatedAt: serverTimestamp(),
-          approvedBy: userData?.uid,
-          approverName: userData?.name,
-        });
+
+        if (canDirectApprove) {
+          const chainEntry: ApprovalChainEntry = {
+            stage: "hod",
+            action: "approved",
+            approverUid: userData.uid,
+            approverName: userData.name,
+            approverRole: "hod",
+            remarks: "Bulk approved by HOD",
+            timestamp: new Date(),
+          };
+          await updateDoc(leaveRef, {
+            status: "approved",
+            currentApprover: "completed",
+            hodRemarks: "Bulk approved by HOD",
+            approvalChain: [...(leave.approvalChain || []), chainEntry],
+            updatedAt: serverTimestamp(),
+            approvedBy: userData.uid,
+            approverName: userData.name,
+          });
+        } else {
+          const chainEntry: ApprovalChainEntry = {
+            stage: "hod",
+            action: "forwarded",
+            approverUid: userData.uid,
+            approverName: userData.name,
+            approverRole: "hod",
+            remarks: "Bulk endorsed by HOD to Principal",
+            timestamp: new Date(),
+          };
+          await updateDoc(leaveRef, {
+            status: "pending_admin",
+            currentApprover: "admin",
+            hodRemarks: "Bulk endorsed by HOD to Principal",
+            approvalChain: [...(leave.approvalChain || []), chainEntry],
+            updatedAt: serverTimestamp(),
+          });
+        }
       }
 
-      toast.success(`Successfully approved ${selectedIds.length} leave requests!`);
+      toast.success(`Successfully processed ${selectedIds.length} leave requests!`);
       setSelectedIds([]);
     } catch (error: any) {
       console.error("Error bulk approving:", error);
@@ -471,15 +560,27 @@ export default function Approvals() {
                                 <Eye className="h-4 w-4" />
                               </Button>
 
-                              <Button
-                                size="sm"
-                                onClick={() => handleApprove(leave)}
-                                disabled={isProcessing}
-                                className="h-8 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm"
-                              >
-                                <Check className="h-3.5 w-3.5 mr-1" />
-                                Approve
-                              </Button>
+                              {canHodApproveDirectly(leave.totalDays || 1) ? (
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleApprove(leave)}
+                                  disabled={isProcessing}
+                                  className="h-8 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm"
+                                >
+                                  <Check className="h-3.5 w-3.5 mr-1" />
+                                  Approve
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleForwardToAdmin(leave)}
+                                  disabled={isProcessing}
+                                  className="h-8 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm"
+                                >
+                                  <Forward className="h-3.5 w-3.5 mr-1" />
+                                  Forward
+                                </Button>
+                              )}
 
                               <Button
                                 size="sm"
@@ -527,6 +628,8 @@ export default function Approvals() {
             </div>
 
             <div className="space-y-4 text-xs">
+              <LeaveAuditStepper leave={selectedLeave as any} />
+
               <div className="grid grid-cols-2 gap-3 p-3 bg-muted/30 dark:bg-zinc-800/60 rounded-xl">
                 <div>
                   <span className="text-muted-foreground block text-[10px] uppercase font-bold">Student</span>
@@ -590,11 +693,25 @@ export default function Approvals() {
                   </a>
                 </div>
               )}
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  HOD Remarks / Recommendations
+                </label>
+                <Textarea
+                  value={hodRemarksInput}
+                  onChange={(e) => setHodRemarksInput(e.target.value)}
+                  placeholder="Enter endorsement remarks or approval conditions..."
+                  className="text-xs"
+                  rows={2}
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-3 border-t dark:border-zinc-800">
               <Button
                 variant="outline"
+                disabled={isProcessing}
                 onClick={() => {
                   setRejectingLeave(selectedLeave);
                   setSelectedLeave(null);
@@ -603,12 +720,25 @@ export default function Approvals() {
               >
                 Reject Request
               </Button>
-              <Button
-                onClick={() => handleApprove(selectedLeave)}
-                className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                Authorize &amp; Approve
-              </Button>
+              {canHodApproveDirectly(selectedLeave.totalDays || 1) ? (
+                <Button
+                  onClick={() => handleApprove(selectedLeave)}
+                  disabled={isProcessing}
+                  className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5"
+                >
+                  <Check className="h-3.5 w-3.5" />
+                  Authorize &amp; Approve (3–5 Days)
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => handleForwardToAdmin(selectedLeave)}
+                  disabled={isProcessing}
+                  className="text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5"
+                >
+                  <Forward className="h-3.5 w-3.5" />
+                  Endorse &amp; Forward to Principal ({selectedLeave.totalDays} Days)
+                </Button>
+              )}
             </div>
           </div>
         </div>

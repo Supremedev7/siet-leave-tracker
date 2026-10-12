@@ -40,6 +40,7 @@ import {
   SlidersHorizontal,
   CheckCircle,
   AlertTriangle,
+  Forward,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
@@ -67,10 +68,11 @@ interface LeaveData {
   startDate: any;
   endDate: any;
   totalDays?: number;
-  status: "pending" | "approved" | "rejected" | "cancelled";
+  status: string;
   reason: string;
   createdAt: any;
   hodRemarks?: string;
+  approvalChain?: any[];
 }
 
 const safeToDate = (dateVal: any): Date | null => {
@@ -199,7 +201,7 @@ export default function HodDashboard() {
     const onLeaveTodayList: LeaveData[] = [];
 
     leaves.forEach((l) => {
-      if (l.status === "pending") pending++;
+      if (l.status === "pending_hod" || l.status === "pending") pending++;
       if (l.status === "approved") {
         approved++;
         const s = safeToDate(l.startDate);
@@ -216,8 +218,15 @@ export default function HodDashboard() {
       if (l.status === "rejected") rejected++;
     });
 
+    const escalatedAdmin = leaves.filter(
+      (l) =>
+        l.status === "pending_admin" ||
+        l.approvalChain?.some((e: any) => e.stage === "hod" && e.action === "forwarded")
+    ).length;
+
     return {
       pending,
+      escalatedAdmin,
       approved,
       rejected,
       total: leaves.length,
@@ -501,7 +510,7 @@ export default function HodDashboard() {
             ))}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <StatsCard
               title="Total Applications"
               value={stats.total}
@@ -511,11 +520,19 @@ export default function HodDashboard() {
             />
 
             <StatsCard
-              title="Pending Reviews"
+              title="Pending HOD Review"
               value={stats.pending}
               subtitle={stats.pending > 0 ? "Requires your attention" : "All cleared"}
               icon={Clock}
               variant="warning"
+            />
+
+            <StatsCard
+              title="Escalated to Admin"
+              value={stats.escalatedAdmin}
+              subtitle="Forwarded to Principal"
+              icon={Forward}
+              variant="neutral"
             />
 
             <StatsCard

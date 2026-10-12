@@ -9,6 +9,8 @@ import {
   CheckSquare,
   FileSpreadsheet,
   User,
+  Users,
+  ShieldAlert,
 } from "lucide-react";
 
 interface MenubarItem {
@@ -33,6 +35,18 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
     { name: "Student Profile", path: "/student/profile", icon: User },
   ];
 
+  const facultyNavItems: MenubarItem[] = [
+    { name: "Class Overview", path: "/faculty/dashboard", icon: LayoutDashboard },
+    {
+      name: "Pending Approvals",
+      path: "/faculty/approvals",
+      icon: CheckSquare,
+      badge: pendingCount,
+    },
+    { name: "Review Archive", path: "/faculty/history", icon: FileSpreadsheet },
+    { name: "Faculty Profile", path: "/faculty/profile", icon: User },
+  ];
+
   const hodNavItems: MenubarItem[] = [
     { name: "Department Analytics", path: "/hod/dashboard", icon: LayoutDashboard },
     {
@@ -42,10 +56,27 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
       badge: pendingCount,
     },
     { name: "Leave Archive", path: "/hod/all-requests", icon: FileSpreadsheet },
-    { name: "Faculty Profile", path: "/hod/profile", icon: User },
+    { name: "Faculty Allocation", path: "/hod/faculty", icon: Users },
+    { name: "HOD Profile", path: "/hod/profile", icon: User },
   ];
 
-  const navItems = userData?.role === "hod" ? hodNavItems : studentNavItems;
+  const adminNavItems: MenubarItem[] = [
+    { name: "Institution Overview", path: "/admin/dashboard", icon: LayoutDashboard },
+    {
+      name: "Executive Approvals",
+      path: "/admin/approvals",
+      icon: ShieldAlert,
+      badge: pendingCount,
+    },
+    { name: "College Archive", path: "/admin/all-requests", icon: FileSpreadsheet },
+    { name: "User Management", path: "/admin/manage-users", icon: Users },
+    { name: "Admin Profile", path: "/admin/profile", icon: User },
+  ];
+
+  let navItems = studentNavItems;
+  if (userData?.role === "faculty") navItems = facultyNavItems;
+  else if (userData?.role === "hod") navItems = hodNavItems;
+  else if (userData?.role === "admin") navItems = adminNavItems;
 
   return (
     <nav className="sticky top-0 z-30 w-full bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-zinc-200/90 dark:border-zinc-800 shadow-sm transition-colors">
