@@ -3,7 +3,7 @@ import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-export type UserRole = "student" | "hod";
+export type UserRole = "student" | "faculty" | "hod" | "admin";
 
 export interface UserData {
   uid: string;
@@ -13,13 +13,19 @@ export interface UserData {
   department: string;
   phone: string;
   createdAt?: any;
+  updatedAt?: any;
   // Student specific
   rollNumber?: string;
   year?: number;
   semester?: number;
   section?: string;
-  // HOD specific
+  // Faculty specific
   employeeId?: string;
+  assignedYear?: number;
+  assignedSection?: string;
+  designation?: string;
+  // Admin specific
+  adminLevel?: "principal" | "dean" | "academic_cell";
 }
 
 interface AuthContextType {

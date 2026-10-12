@@ -2,41 +2,55 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    function getUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return request.auth != null && getUser().role == "admin";
+    }
+    
+    function isHOD() {
+      return request.auth != null && getUser().role == "hod";
+    }
+    
+    function isFaculty() {
+      return request.auth != null && getUser().role == "faculty";
+    }
+
     // User profile document rules
     match /users/{userId} {
-      // Authenticated users can read their own profile, or any authenticated user can read minimal profile
       allow read: if request.auth != null;
-      // Users can only create or edit their own profile
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && request.auth.uid == userId;
-      allow delete: if false; // Deletion reserved for admin
+      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin() || isHOD());
+      allow delete: if isAdmin();
     }
     
     // Leave requests rules
     match /leaveRequests/{leaveId} {
-      // Students can read their own leave requests; HODs can read leaves in their department
       allow read: if request.auth != null && (
         resource.data.studentUid == request.auth.uid ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "hod"
+        isFaculty() ||
+        isHOD() ||
+        isAdmin()
       );
       
-      // Students can create leave requests
       allow create: if request.auth != null && request.resource.data.studentUid == request.auth.uid;
       
-      // Student can cancel their own pending leave request
-      // HOD can update status and remarks
       allow update: if request.auth != null && (
         (resource.data.studentUid == request.auth.uid && request.resource.data.status == "cancelled") ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "hod"
+        (isFaculty() && resource.data.status == "pending_faculty") ||
+        (isHOD() && (resource.data.status == "pending_hod" || resource.data.department == getUser().department)) ||
+        isAdmin()
       );
       
-      allow delete: if false;
+      allow delete: if isAdmin();
     }
     
-    // Department Working Days configuration (HOD sets monthly working days, authenticated users can read)
+    // Department Working Days configuration
     match /departmentWorkingDays/{docId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "hod";
+      allow write: if isHOD() || isAdmin();
     }
   }
 }
