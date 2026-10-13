@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Check, X, ShieldAlert, Phone, Paperclip } from "lucide-react";
 import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
+import { sendLeaveNotification } from "@/lib/notifications";
 
 export default function AdminApprovals() {
   const { userData } = useAuth();
@@ -63,6 +64,23 @@ export default function AdminApprovals() {
         adminRemarks: remarks.trim() || null,
         approvalChain: [...(selectedLeave.approvalChain || []), chainEntry],
         updatedAt: serverTimestamp(),
+      });
+
+      // Dispatch notification
+      sendLeaveNotification({
+        recipientUid: selectedLeave.studentUid,
+        title: action === "approved" ? "Executive Clearance Granted" : "Leave Rejected by Principal",
+        body: action === "approved"
+          ? `Your extended leave (${selectedLeave.startDate} to ${selectedLeave.endDate}) was approved by Principal / Executive Admin.`
+          : `Your extended leave request was rejected by Principal / Executive Admin.`,
+        type: action === "approved" ? "approval" : "rejection",
+        leaveId: selectedLeave.id,
+        metadata: {
+          actorName: userData.name,
+          actorRole: "admin",
+          leaveType: selectedLeave.type,
+          remarks: remarks.trim(),
+        },
       });
 
       toast.success(action === "approved" ? "Institutional clearance granted!" : "Leave application rejected.");

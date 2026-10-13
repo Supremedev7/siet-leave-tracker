@@ -1,0 +1,21 @@
+{
+  "short_name": "SIET Leaves",
+  "name": "SIET Academic Leave Portal",
+  "icons": [
+    {
+      "src": "/siet-emblem.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/siet-emblem.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#8B1A1A",
+  "display": "standalone",
+  "orientation": "portrait"
+}

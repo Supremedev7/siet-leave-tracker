@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { sendLeaveNotification } from "@/lib/notifications";
 import {
   CheckCircle2,
   XCircle,
@@ -70,6 +71,25 @@ export default function HodFacultyApprovals() {
         approvedAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+
+      // Find target leave and notify faculty member
+      const targetLeave = leaves.find((l) => l.id === leaveId);
+      if (targetLeave) {
+        sendLeaveNotification({
+          recipientUid: targetLeave.facultyUid,
+          title: `Faculty Leave Request ${action === "approved" ? "Approved" : "Rejected"}`,
+          body: `Your leave from ${formatDate(targetLeave.startDate)} to ${formatDate(targetLeave.endDate)} was ${action} by HOD ${userData.name}.`,
+          type: action === "approved" ? "approval" : "rejection",
+          leaveId: targetLeave.id,
+          metadata: {
+            actorName: userData.name,
+            actorRole: "hod",
+            leaveType: targetLeave.type,
+            remarks: remarks[leaveId] || "",
+          },
+        });
+      }
+
       toast.success(`Leave request ${action}`, {
         description: `Faculty leave has been ${action} successfully.`,
       });

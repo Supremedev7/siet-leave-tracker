@@ -6,6 +6,7 @@ import { signOut } from "firebase/auth";
 import { toast } from "sonner";
 import { SIETLogo, sietEmblem } from "@/components/branding/SIETLogo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { NotificationBell } from "@/components/common/NotificationBell";
 import { LogOut, Calendar, ChevronDown, User } from "lucide-react";
 
 export const TopMasthead: React.FC = () => {
@@ -62,8 +63,9 @@ export const TopMasthead: React.FC = () => {
           </span>
         </div>
 
-        {/* Right: Theme Toggle & User Profile Actions Menu */}
+        {/* Right: Notification Bell, Theme Toggle & User Profile Actions Menu */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <NotificationBell />
           <ThemeToggle />
 
           {/* User Profile Pill */}

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { initForegroundNotificationListener } from "@/lib/notifications";
+import { clearSessionData } from "@/lib/session";
 
 export type UserRole = "student" | "faculty" | "hod" | "admin";
 
@@ -74,17 +76,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
+    let unsubsForeground: (() => void) | undefined;
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
         await fetchUserData(firebaseUser);
+        // Start foreground push notifications listener
+        initForegroundNotificationListener().then((cleanup) => {
+          unsubsForeground = cleanup;
+        });
       } else {
         setUserData(null);
+        clearSessionData();
+        if (unsubsForeground) {
+          unsubsForeground();
+          unsubsForeground = undefined;
+        }
       }
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (unsubsForeground) unsubsForeground();
+    };
   }, []);
 
   // Always render children — loading state handled by router/components

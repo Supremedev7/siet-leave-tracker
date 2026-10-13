@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Check, X, Forward, Clock, Phone } from "lucide-react";
 import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
+import { sendLeaveNotification } from "@/lib/notifications";
 
 export default function FacultyApprovals() {
   const { userData } = useAuth();
@@ -88,6 +89,37 @@ export default function FacultyApprovals() {
         facultyRemarks: remarks.trim() || null,
         approvalChain: updatedChain,
         updatedAt: serverTimestamp(),
+      });
+
+      // Dispatch FCM Push & Real-Time Notification to student
+      const notifType = action === "approved" ? "approval" : action === "rejected" ? "rejection" : "forwarded";
+      const notifTitle =
+        action === "approved"
+          ? "Leave Approved by Class Advisor"
+          : action === "forwarded"
+          ? "Leave Forwarded to HOD"
+          : "Leave Rejected by Class Advisor";
+      const notifBody =
+        action === "approved"
+          ? `Your ${selectedLeave.type} leave (${selectedLeave.startDate} to ${selectedLeave.endDate}) has been approved.`
+          : action === "forwarded"
+          ? `Your ${selectedLeave.type} leave request has been reviewed and forwarded to the HOD.`
+          : `Your ${selectedLeave.type} leave request was rejected by your Class Advisor.`;
+
+      sendLeaveNotification({
+        recipientUid: selectedLeave.studentUid,
+        title: notifTitle,
+        body: notifBody,
+        type: notifType,
+        leaveId: selectedLeave.id,
+        metadata: {
+          actorName: userData.name,
+          actorRole: "faculty",
+          leaveType: selectedLeave.type,
+          startDate: selectedLeave.startDate,
+          endDate: selectedLeave.endDate,
+          remarks: remarks.trim(),
+        },
       });
 
       toast.success(

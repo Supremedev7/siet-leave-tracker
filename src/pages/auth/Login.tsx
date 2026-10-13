@@ -3,11 +3,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { auth } from "@/lib/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+} from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { recordSessionLogin } from "@/lib/session";
 import SIETLoadingScreen from "@/components/ui/LoadingScreen";
 import { sietEmblem } from "@/components/branding/SIETLogo";
 import { AuthDynamicSidePanel } from "@/components/auth/AuthDynamicSidePanel";
@@ -40,6 +46,7 @@ function getErrorMessage(code: string): string {
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -63,7 +70,14 @@ export default function Login() {
     setIsLoading(true);
     setError("");
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await setPersistence(
+        auth,
+        rememberMe ? browserLocalPersistence : browserSessionPersistence
+      );
+      const cred = await signInWithEmailAndPassword(auth, values.email, values.password);
+      if (cred.user) {
+        await recordSessionLogin(cred.user.uid, values.email, rememberMe);
+      }
       toast.success("Authentication successful. Redirecting to portal...");
     } catch (err: any) {
       const code = err.code ?? "";
@@ -155,6 +169,24 @@ export default function Login() {
                   {form.formState.errors.password.message}
                 </p>
               )}
+            </div>
+
+            {/* Session Persistence & Device Memory Checkbox */}
+            <div className="flex items-center justify-between text-xs py-1">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-zinc-700 dark:text-zinc-300 font-medium">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded text-siet-primary focus:ring-siet-primary/20 accent-siet-primary cursor-pointer"
+                />
+                <span>Remember this device</span>
+              </label>
+
+              <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                TLS Encrypted
+              </span>
             </div>
 
             {/* Error message */}

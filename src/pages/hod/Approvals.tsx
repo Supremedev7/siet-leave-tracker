@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
+import { sendLeaveNotification } from "@/lib/notifications";
 import {
   Check,
   X,
@@ -139,6 +140,23 @@ export default function Approvals() {
         approverName: userData.name,
       });
 
+      // Dispatch FCM Push & Real-Time Notification to student
+      sendLeaveNotification({
+        recipientUid: leave.studentUid,
+        title: "Leave Approved by HOD",
+        body: `Your ${leave.type} leave (${safeFormatDate(leave.startDate)} to ${safeFormatDate(leave.endDate)}) has been approved by HOD ${userData.name}.`,
+        type: "approval",
+        leaveId: leave.id,
+        metadata: {
+          actorName: userData.name,
+          actorRole: "hod",
+          leaveType: leave.type,
+          startDate: safeFormatDate(leave.startDate),
+          endDate: safeFormatDate(leave.endDate),
+          remarks: hodRemarksInput.trim() || "Approved by HOD",
+        },
+      });
+
       toast.success(`Leave approved for ${leave.studentName}`, {
         description: `${leave.type} leave (${safeFormatDate(leave.startDate)} to ${safeFormatDate(leave.endDate)}) is authorized.`,
       });
@@ -177,6 +195,21 @@ export default function Approvals() {
         hodRemarks: hodRemarksInput.trim() || "Endorsed by HOD",
         approvalChain: [...(leave.approvalChain || []), chainEntry],
         updatedAt: serverTimestamp(),
+      });
+
+      // Dispatch notification
+      sendLeaveNotification({
+        recipientUid: leave.studentUid,
+        title: "Leave Forwarded to Principal",
+        body: `Your ${leave.type} leave (${leave.totalDays} days) has been endorsed by HOD and forwarded to the Principal.`,
+        type: "forwarded",
+        leaveId: leave.id,
+        metadata: {
+          actorName: userData.name,
+          actorRole: "hod",
+          leaveType: leave.type,
+          remarks: hodRemarksInput.trim() || "Endorsed by HOD",
+        },
       });
 
       toast.success(`Endorsed and forwarded to Principal for ${leave.studentName}`, {
@@ -226,6 +259,21 @@ export default function Approvals() {
         updatedAt: serverTimestamp(),
         rejectedBy: userData.uid,
         approverName: userData.name,
+      });
+
+      // Dispatch notification
+      sendLeaveNotification({
+        recipientUid: rejectingLeave.studentUid,
+        title: "Leave Rejected by HOD",
+        body: `Your ${rejectingLeave.type} leave request was rejected by HOD ${userData.name}. Reason: ${rejectionRemark.trim()}`,
+        type: "rejection",
+        leaveId: rejectingLeave.id,
+        metadata: {
+          actorName: userData.name,
+          actorRole: "hod",
+          leaveType: rejectingLeave.type,
+          remarks: rejectionRemark.trim(),
+        },
       });
 
       toast.error(`Leave rejected for ${rejectingLeave.studentName}`, {
