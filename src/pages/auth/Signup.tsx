@@ -59,6 +59,7 @@ const signupSchema = z
 
     // Faculty & HOD specific
     employeeId: z.string().optional(),
+    degrees: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
@@ -154,6 +155,7 @@ export default function Signup() {
       semester: "1",
       section: "A",
       employeeId: "",
+      degrees: "",
     },
   });
 
@@ -191,8 +193,10 @@ export default function Signup() {
         userData.assignedYear = values.year ? Number(values.year) : 1;
         userData.assignedSection = values.section?.toUpperCase().trim() || "A";
         userData.designation = "Class Advisor";
+        userData.degrees = values.degrees?.trim() || "";
       } else {
         userData.employeeId = values.employeeId?.toUpperCase().trim();
+        userData.degrees = values.degrees?.trim() || "";
       }
 
       await setDoc(doc(db, "users", uid), userData);
@@ -553,6 +557,25 @@ export default function Signup() {
                       )}
                     />
                   </div>
+                  <FormField
+                    control={form.control}
+                    name="degrees"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-bold text-muted-foreground uppercase">
+                          Degrees / Qualifications
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. M.Tech, Ph.D, B.Tech"
+                            className="h-9 text-xs bg-white border-border"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               )}
 
@@ -571,6 +594,25 @@ export default function Signup() {
                           <Input
                             placeholder="e.g. FAC-CSE-001"
                             className="h-10 text-xs bg-white border-border uppercase"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="degrees"
+                    render={({ field }) => (
+                      <FormItem className="mt-3">
+                        <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
+                          Degrees / Qualifications
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. M.Tech, Ph.D, B.Tech"
+                            className="h-10 text-xs bg-white border-border"
                             {...field}
                           />
                         </FormControl>

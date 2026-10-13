@@ -13,11 +13,14 @@ import FacultyDashboard from "@/pages/faculty/FacultyDashboard";
 import FacultyApprovals from "@/pages/faculty/FacultyApprovals";
 import FacultyHistory from "@/pages/faculty/FacultyHistory";
 import FacultyProfile from "@/pages/faculty/FacultyProfile";
+import FacultyApplyLeave from "@/pages/faculty/FacultyApplyLeave";
+import FacultyMyLeaves from "@/pages/faculty/FacultyMyLeaves";
 import HodDashboard from "@/pages/hod/HodDashboard";
 import Approvals from "@/pages/hod/Approvals";
 import AllRequests from "@/pages/hod/AllRequests";
 import FacultyManagement from "@/pages/hod/FacultyManagement";
 import HodProfile from "@/pages/hod/Profile";
+import HodFacultyApprovals from "@/pages/hod/HodFacultyApprovals";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApprovals from "@/pages/admin/AdminApprovals";
 import AdminAllRequests from "@/pages/admin/AdminAllRequests";
@@ -133,6 +136,26 @@ export const AppRouter = () => {
           }
         />
         <Route
+          path="/faculty/apply-leave"
+          element={
+            <ProtectedRoute allowedRole="faculty">
+              <PageTransition>
+                <FacultyApplyLeave />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/my-leaves"
+          element={
+            <ProtectedRoute allowedRole="faculty">
+              <PageTransition>
+                <FacultyMyLeaves />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/faculty/profile"
           element={
             <ProtectedRoute allowedRole="faculty">
@@ -171,6 +194,16 @@ export const AppRouter = () => {
             <ProtectedRoute allowedRole="hod">
               <PageTransition>
                 <AllRequests />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hod/faculty-approvals"
+          element={
+            <ProtectedRoute allowedRole="hod">
+              <PageTransition>
+                <HodFacultyApprovals />
               </PageTransition>
             </ProtectedRoute>
           }

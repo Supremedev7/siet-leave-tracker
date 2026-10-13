@@ -58,3 +58,30 @@ export interface ClassAssignment {
   year: number;
   section: string;
 }
+
+// Faculty Leave Application types
+export type FacultyLeaveStatus = "pending_hod" | "approved" | "rejected" | "cancelled";
+
+export interface FacultyLeaveRequest {
+  id: string;
+  facultyUid: string;
+  facultyName: string;
+  employeeId: string;
+  department: string;
+  designation?: string;
+  type: LeaveType;
+  startDate: any; // Firestore Timestamp
+  endDate: any;
+  totalDays: number;
+  reason: string;
+  emergencyPhone: string;
+  attachmentUrl?: string | null;
+  status: FacultyLeaveStatus;
+  hodRemarks?: string;
+  approvedByUid?: string;
+  approvedByName?: string;
+  approvedAt?: any;
+  createdAt: any;
+  updatedAt: any;
+}
+

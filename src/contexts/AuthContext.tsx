@@ -24,6 +24,7 @@ export interface UserData {
   assignedYear?: number;
   assignedSection?: string;
   designation?: string;
+  degrees?: string; // Comma-separated e.g. "M.Tech, Ph.D"
   // Admin specific
   adminLevel?: "principal" | "dean" | "academic_cell";
 }

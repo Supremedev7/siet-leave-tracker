@@ -337,7 +337,7 @@ export const Landing: React.FC = () => {
                 HOD Working Days Sync
               </h3>
               <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                Department Heads configure official monthly working days.
+                Heads of the Department configure official monthly working days.
                 Students' monthly and cumulative percentages are computed in
                 real-time against verified working sessions.
               </p>

@@ -111,7 +111,7 @@ export default function HodProfile() {
             Faculty Administration
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-display">
-            Department Head Profile
+            Head of the Department Profile
           </h2>
           <p className="text-sm text-muted-foreground mt-0.5">
             Manage your institutional profile, contact numbers, and security credentials.
@@ -152,7 +152,7 @@ export default function HodProfile() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xl sm:text-2xl font-bold font-display">
-                    {userData?.name || "Department Head"}
+                    {userData?.name || "Head of the Department"}
                   </h3>
                   <span className="text-[10px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-full bg-siet-gold text-zinc-900">
                     HOD
@@ -163,8 +163,20 @@ export default function HodProfile() {
                 </p>
                 <p className="text-xs text-white/70 mt-1 flex items-center gap-1.5">
                   <Building2 className="h-3.5 w-3.5 text-siet-gold" />
-                  Head of Department • {userData?.department} Engineering
+                  Head of the Department • {userData?.department} Engineering
                 </p>
+                {userData?.degrees && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {userData.degrees.split(",").map((deg, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/20"
+                      >
+                        {deg.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

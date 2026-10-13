@@ -52,5 +52,26 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if isHOD() || isAdmin();
     }
+
+    // Faculty Leave Requests
+    match /facultyLeaveRequests/{leaveId} {
+      allow read: if request.auth != null && (
+        resource.data.facultyUid == request.auth.uid ||
+        isHOD() ||
+        isAdmin()
+      );
+      
+      allow create: if request.auth != null && 
+        (isFaculty() || isHOD()) &&
+        request.resource.data.facultyUid == request.auth.uid;
+      
+      allow update: if request.auth != null && (
+        (resource.data.facultyUid == request.auth.uid && request.resource.data.status == "cancelled") ||
+        (isHOD() && resource.data.department == getUser().department) ||
+        isAdmin()
+      );
+      
+      allow delete: if isAdmin();
+    }
   }
 }

@@ -117,7 +117,7 @@ export const TopMasthead: React.FC = () => {
                       {userData?.role === "admin"
                         ? "Central Administrator"
                         : userData?.role === "hod"
-                        ? "Department Head"
+                        ? "Head of the Department"
                         : userData?.role === "faculty"
                         ? "Class Advisor"
                         : "Student"}

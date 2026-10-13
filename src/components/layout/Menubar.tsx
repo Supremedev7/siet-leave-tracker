@@ -11,6 +11,7 @@ import {
   User,
   Users,
   ShieldAlert,
+  Briefcase,
 } from "lucide-react";
 
 interface MenubarItem {
@@ -44,6 +45,8 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
       badge: pendingCount,
     },
     { name: "Review Archive", path: "/faculty/history", icon: FileSpreadsheet },
+    { name: "Apply Leave", path: "/faculty/apply-leave", icon: FilePlus2 },
+    { name: "My Leaves", path: "/faculty/my-leaves", icon: Briefcase },
     { name: "Faculty Profile", path: "/faculty/profile", icon: User },
   ];
 
@@ -56,6 +59,7 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
       badge: pendingCount,
     },
     { name: "Leave Archive", path: "/hod/all-requests", icon: FileSpreadsheet },
+    { name: "Faculty Leaves", path: "/hod/faculty-approvals", icon: Briefcase },
     { name: "Faculty Allocation", path: "/hod/faculty", icon: Users },
     { name: "HOD Profile", path: "/hod/profile", icon: User },
   ];
