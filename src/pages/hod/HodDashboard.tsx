@@ -125,7 +125,7 @@ export default function HodDashboard() {
     useState<StudentProfileData | null>(null);
 
   // Department Working Days state for current month
-  const now = new Date();
+  const now = useMemo(() => new Date(), []);
   const currentYearMonth = format(now, "yyyy-MM");
   const [currentMonthWorkingDays, setCurrentMonthWorkingDays] = useState<number>(
     calculateDefaultWorkingDays(now.getFullYear(), now.getMonth())
@@ -162,7 +162,7 @@ export default function HodDashboard() {
     });
 
     return () => unsubscribe();
-  }, [userData?.department, currentYearMonth]);
+  }, [userData?.department, currentYearMonth, now]);
 
   // Real-time listener for all department leaves
   useEffect(() => {
@@ -398,7 +398,7 @@ export default function HodDashboard() {
         attendance,
       };
     });
-  }, [leaves, userData?.department, currentMonthWorkingDays, isCustomDaysConfigured]);
+  }, [leaves, userData?.department, currentMonthWorkingDays, isCustomDaysConfigured, now]);
 
   // Apply Multi-Facet Filters to Department Students
   const filteredStudents = useMemo(() => {

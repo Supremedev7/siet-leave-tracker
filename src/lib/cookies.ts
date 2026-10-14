@@ -51,7 +51,7 @@ export function getCookie(name: string): string | null {
     const encodedName = encodeURIComponent(name) + "=";
     const cookies = document.cookie.split(";");
     for (let i = 0; i < cookies.length; i++) {
-      let c = cookies[i].trim();
+      const c = cookies[i].trim();
       if (c.indexOf(encodedName) === 0) {
         return decodeURIComponent(c.substring(encodedName.length));
       }
