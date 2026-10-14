@@ -206,7 +206,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-50/50 dark:bg-zinc-950 transition-colors font-sans">
+    <div className="min-h-[100dvh] flex bg-zinc-50 dark:bg-zinc-950 transition-colors font-sans">
       {/* ═══ DYNAMIC LEFT PANEL — SIET Institutional Branding ═══ */}
       <AuthDynamicSidePanel pageType="login" />
 
@@ -216,48 +216,50 @@ export default function Login() {
           <ThemeToggle />
         </div>
 
-        <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none p-6 sm:p-10 my-auto transition-colors">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-10 my-auto transition-colors">
           {/* Header with Emblem */}
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white dark:bg-zinc-800 p-1 border border-zinc-200 dark:border-zinc-700 shadow-md mb-3">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white dark:bg-zinc-800 p-1 border border-zinc-200 dark:border-zinc-700 mb-3">
               <img
                 src={sietEmblem}
                 alt="SIET Emblem"
+                width={56}
+                height={56}
                 className="w-full h-full object-contain"
               />
             </div>
-            <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 font-display tracking-tight">
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display tracking-tight">
               Academic Portal Sign In
-            </h2>
+            </h1>
             <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-xs">
               Srinivasa Institute of Engineering &amp; Technology
             </p>
           </div>
 
           {/* Institutional Portal Switcher (Student vs Faculty/Staff) */}
-          <div className="grid grid-cols-2 p-1.5 mb-6 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60">
+          <div className="grid grid-cols-2 p-1 mb-6 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80">
             <button
               type="button"
               onClick={() => handlePortalSwitch("student")}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-colors ${
                 activePortal === "student"
-                  ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 shadow-sm"
-                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 font-bold"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
               }`}
             >
-              <GraduationCap className="h-4 w-4" />
+              <GraduationCap className="h-4 w-4" aria-hidden="true" />
               <span>Student Portal</span>
             </button>
             <button
               type="button"
               onClick={() => handlePortalSwitch("staff")}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-colors ${
                 activePortal === "staff"
-                  ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 shadow-sm"
-                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 font-bold"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
               }`}
             >
-              <Briefcase className="h-4 w-4" />
+              <Briefcase className="h-4 w-4" aria-hidden="true" />
               <span>Faculty &amp; Staff Desk</span>
             </button>
           </div>
@@ -267,37 +269,42 @@ export default function Login() {
             {/* Dynamic Identifier Field */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                  {activePortal === "student" ? "College Email Address" : "Staff Employee ID or Email"}
+                <label
+                  htmlFor="login-identifier"
+                  className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300"
+                >
+                  {activePortal === "student" ? "College email address" : "Staff employee ID or email"}
                 </label>
-                <span className="text-[10px] font-medium text-muted-foreground">
-                  {activePortal === "student" ? "JNTUK Format" : "Assigned ID"}
+                <span className="text-[11px] font-normal text-zinc-400">
+                  {activePortal === "student" ? "JNTUK roll format" : "Assigned staff code"}
                 </span>
               </div>
               <div className="relative">
                 {activePortal === "student" ? (
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" aria-hidden="true" />
                 ) : (
-                  <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" aria-hidden="true" />
                 )}
                 <input
+                  id="login-identifier"
                   type={activePortal === "student" ? "email" : "text"}
                   placeholder={
                     activePortal === "student"
                       ? "256N5A0511@sriniet.edu.in"
-                      : "e.g. F26AIML0S001 or H26CSE0S001"
+                      : "e.g. F26AIML0S001"
                   }
                   autoComplete={activePortal === "student" ? "email" : "username"}
+                  spellCheck={false}
                   {...form.register("identifier")}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 text-foreground dark:text-zinc-100 text-xs font-medium placeholder:text-muted-foreground/60 dark:placeholder:text-zinc-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-siet-primary/20 focus:border-siet-primary ${
-                    activePortal === "staff" ? "uppercase font-mono" : ""
+                  className={`w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-medium placeholder:text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-siet-primary ${
+                    activePortal === "staff" ? "uppercase tabular-nums tracking-wide" : ""
                   }`}
                 />
               </div>
               {form.formState.errors.identifier && (
-                <p className="mt-1.5 text-xs text-destructive font-medium flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3 inline" />
-                  {form.formState.errors.identifier.message}
+                <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400 font-medium flex items-center gap-1" aria-live="polite">
+                  <AlertCircle className="h-3 w-3 inline shrink-0" aria-hidden="true" />
+                  <span>{form.formState.errors.identifier.message}</span>
                 </p>
               )}
             </div>
@@ -305,31 +312,36 @@ export default function Login() {
             {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                <label
+                  htmlFor="login-password"
+                  className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300"
+                >
                   Password
                 </label>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" aria-hidden="true" />
                 <input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   autoComplete="current-password"
                   {...form.register("password")}
-                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 text-foreground dark:text-zinc-100 text-xs font-medium placeholder:text-muted-foreground/60 dark:placeholder:text-zinc-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-siet-primary/20 focus:border-siet-primary"
+                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-medium placeholder:text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-siet-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                 </button>
               </div>
               {form.formState.errors.password && (
-                <p className="mt-1.5 text-xs text-destructive font-medium flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3 inline" />
-                  {form.formState.errors.password.message}
+                <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400 font-medium flex items-center gap-1" aria-live="polite">
+                  <AlertCircle className="h-3 w-3 inline shrink-0" aria-hidden="true" />
+                  <span>{form.formState.errors.password.message}</span>
                 </p>
               )}
             </div>
@@ -341,60 +353,79 @@ export default function Login() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded text-siet-primary focus:ring-siet-primary/20 accent-siet-primary cursor-pointer"
+                  className="w-4 h-4 rounded text-siet-primary focus:ring-siet-primary accent-siet-primary cursor-pointer"
                 />
-                <span>Remember this device</span>
+                <span>Remember this session</span>
               </label>
 
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                TLS Encrypted
+              <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                TLS Verified
               </span>
             </div>
 
             {/* Error Banner */}
             {error && (
-              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-xs text-rose-800 dark:text-rose-200 leading-relaxed flex items-start gap-2.5">
-                <AlertCircle className="h-4 w-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+              <div
+                className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-xs text-rose-800 dark:text-rose-200 leading-relaxed flex items-start gap-2.5"
+                aria-live="assertive"
+              >
+                <AlertCircle className="h-4 w-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" aria-hidden="true" />
                 <span>{error}</span>
               </div>
             )}
 
-            {/* Submit */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-white text-xs transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-              style={{
-                background: isLoading ? "#A52A2A" : "linear-gradient(135deg, #8B1A1A, #6B1414)",
-              }}
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-semibold text-white text-xs bg-siet-primary hover:bg-siet-primary-dark transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-siet-primary focus-visible:ring-offset-2"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Verifying Credentials…</span>
+                  <svg
+                    className="w-4 h-4 animate-spin text-white shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                  <span>Verifying credentials…</span>
                 </>
               ) : (
                 <>
                   <span>
                     {activePortal === "student" ? "Sign In to Student Portal" : "Sign In to Staff Desk"}
                   </span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </>
               )}
             </button>
           </form>
 
           {/* Footer Navigation */}
-          <p className="mt-6 text-center text-xs text-muted-foreground dark:text-zinc-400">
+          <p className="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400">
             Don't have an institutional account?{" "}
-            <Link to="/signup" className="font-bold text-siet-primary dark:text-red-400 hover:underline transition-colors">
+            <Link to="/signup" className="font-semibold text-siet-primary dark:text-red-400 hover:underline transition-colors">
               Register here
             </Link>
           </p>
 
           {/* Instructions note */}
-          <div className="mt-6 p-3.5 rounded-xl border border-border dark:border-zinc-800 bg-muted/30 dark:bg-zinc-850/60 text-[11px] text-muted-foreground dark:text-zinc-400 text-center leading-relaxed">
+          <div className="mt-6 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-850/60 text-[11px] text-zinc-500 dark:text-zinc-400 text-center leading-relaxed">
             {activePortal === "student" ? (
               <span>
                 Students must use their official JNTUK roll email (<strong className="text-zinc-800 dark:text-zinc-200">[RollNo]@sriniet.edu.in</strong>). Personal domains (Gmail, Yahoo) are prohibited.

@@ -31,7 +31,7 @@ export const TopMasthead: React.FC = () => {
   const dashboardRoute = `/${userData?.role || "student"}/dashboard`;
 
   return (
-    <header className="w-full bg-white dark:bg-zinc-900 border-b border-zinc-200/90 dark:border-zinc-800 relative z-40 select-none transition-colors">
+    <header className="w-full bg-white dark:bg-zinc-900 border-b border-zinc-200/90 dark:border-zinc-800 relative z-40 select-none transition-colors" data-ui="true">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Left: Official SIET Full Brand Logo */}
         <Link
@@ -43,7 +43,8 @@ export const TopMasthead: React.FC = () => {
             <span className="font-extrabold text-base text-siet-primary dark:text-red-400 tracking-wide font-display block">
               SIET
             </span>
-            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold tracking-wider uppercase block border-l border-zinc-200 dark:border-zinc-700 pl-2">
+            <span className="text-zinc-400 dark:text-zinc-600 select-none" aria-hidden="true">/</span>
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold tracking-wider uppercase block">
               Leave Portal
             </span>
           </div>
@@ -51,7 +52,7 @@ export const TopMasthead: React.FC = () => {
 
         {/* Center: Academic Session Indicator */}
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/80 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-          <Calendar className="h-3.5 w-3.5 text-siet-primary dark:text-red-400" />
+          <Calendar className="h-3.5 w-3.5 text-siet-primary dark:text-red-400" aria-hidden="true" />
           <span>Academic Year 2025–26</span>
           <span className="text-zinc-300 dark:text-zinc-600">•</span>
           <span className="font-semibold text-zinc-800 dark:text-zinc-200">
@@ -72,12 +73,14 @@ export const TopMasthead: React.FC = () => {
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex items-center gap-3 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/80 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-zinc-50/80 dark:hover:bg-zinc-750 transition-all text-left shadow-xs"
+              className="flex items-center gap-3 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/80 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-zinc-50/80 dark:hover:bg-zinc-750 transition-colors text-left"
             >
-              <div className="h-9 w-9 rounded-full bg-white dark:bg-zinc-700 p-0.5 border border-zinc-200 dark:border-zinc-600 shadow-xs flex items-center justify-center flex-shrink-0">
+              <div className="h-9 w-9 rounded-full bg-white dark:bg-zinc-700 p-0.5 border border-zinc-200 dark:border-zinc-600 flex items-center justify-center flex-shrink-0">
                 <img
                   src={sietEmblem}
                   alt="Official Emblem"
+                  width={32}
+                  height={32}
                   className="h-full w-full object-contain rounded-full"
                 />
               </div>
@@ -86,7 +89,7 @@ export const TopMasthead: React.FC = () => {
                 <p className="font-bold text-xs text-zinc-900 dark:text-zinc-100 truncate max-w-[140px]">
                   {userData?.name || "Academic User"}
                 </p>
-                <p className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 font-medium">
+                <p className="text-[10px] tabular-nums text-zinc-500 dark:text-zinc-400 font-medium">
                   {userData?.role === "admin"
                     ? "Principal / Admin"
                     : userData?.role === "hod"
@@ -97,7 +100,7 @@ export const TopMasthead: React.FC = () => {
                 </p>
               </div>
 
-              <ChevronDown className="h-3.5 w-3.5 text-zinc-400 hidden sm:block" />
+              <ChevronDown className="h-3.5 w-3.5 text-zinc-400 hidden sm:block" aria-hidden="true" />
             </button>
 
             {/* Dropdown Menu */}
@@ -107,15 +110,18 @@ export const TopMasthead: React.FC = () => {
                   className="fixed inset-0 z-30"
                   onClick={() => setMenuOpen(false)}
                 />
-                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl p-2 z-40 animate-fade-up">
-                  <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800">
+                <div
+                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 z-40 animate-fade-up"
+                  data-ui="true"
+                >
+                  <div className="px-3 py-2 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl mb-1">
                     <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                       {userData?.name}
                     </p>
-                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono truncate">
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 tabular-nums truncate">
                       {userData?.email}
                     </p>
-                    <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-siet-primary/10 dark:bg-red-500/15 text-siet-primary dark:text-red-400 rounded-md border border-siet-primary/20 dark:border-red-500/30">
+                    <span className="inline-block mt-1 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-siet-primary/10 dark:bg-red-500/15 text-siet-primary dark:text-red-400 rounded-md">
                       {userData?.role === "admin"
                         ? "Central Administrator"
                         : userData?.role === "hod"
@@ -126,25 +132,25 @@ export const TopMasthead: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="py-1">
+                  <div className="py-0.5">
                     <Link
                       to={`/${userData?.role || "student"}/profile`}
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/70 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     >
-                      <User className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
+                      <User className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />
                       View Profile &amp; ID
                     </Link>
                   </div>
 
-                  <div className="border-t border-zinc-100 dark:border-zinc-800 pt-1">
+                  <div className="pt-0.5">
                     <button
                       onClick={handleLogout}
                       disabled={isLoggingOut}
                       className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
                     >
-                      <LogOut className="h-3.5 w-3.5" />
-                      {isLoggingOut ? "Signing out..." : "Sign Out"}
+                      <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+                      {isLoggingOut ? "Signing out…" : "Sign Out"}
                     </button>
                   </div>
                 </div>

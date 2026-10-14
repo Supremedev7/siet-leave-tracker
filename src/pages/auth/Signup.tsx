@@ -319,7 +319,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex bg-zinc-50 dark:bg-zinc-950 font-sans transition-colors">
+    <div className="min-h-[100dvh] flex bg-zinc-50 dark:bg-zinc-950 font-sans transition-colors">
       {/* Dynamic Institutional Left Branding Panel */}
       <AuthDynamicSidePanel pageType="signup" />
 
@@ -329,19 +329,21 @@ export default function Signup() {
           <ThemeToggle />
         </div>
 
-        <div className="w-full max-w-xl bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-10 shadow-xl border border-zinc-200/80 dark:border-zinc-800 my-auto transition-colors">
+        <div className="w-full max-w-xl bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-10 border border-zinc-200/90 dark:border-zinc-800 my-auto transition-colors" data-ui="true">
           {/* Mobile Header with Emblem */}
-          <div className="lg:hidden flex items-center gap-3 mb-6 pb-4 border-b border-border dark:border-zinc-800">
-            <div className="w-12 h-12 rounded-xl bg-white dark:bg-zinc-800 p-1 border border-border dark:border-zinc-700 shadow-sm flex items-center justify-center flex-shrink-0">
+          <div className="lg:hidden flex items-center gap-3 mb-6 pb-4">
+            <div className="w-12 h-12 rounded-xl bg-white dark:bg-zinc-800 p-1 border border-border dark:border-zinc-700 flex items-center justify-center flex-shrink-0">
               <img
                 src={sietEmblem}
                 alt="SIET Emblem"
+                width={40}
+                height={40}
                 className="w-full h-full object-contain"
               />
             </div>
             <div>
               <h2 className="font-bold text-lg text-siet-primary dark:text-red-400 font-display">SIET Portal</h2>
-              <p className="text-[11px] text-muted-foreground dark:text-zinc-400">Srinivasa Institute • Cheyyeru</p>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Srinivasa Institute • Cheyyeru</p>
             </div>
           </div>
 
@@ -349,9 +351,9 @@ export default function Signup() {
             <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 font-display">
               Register Academic Account
             </h1>
-            <p className="text-xs text-muted-foreground dark:text-zinc-400">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Sign up using your official institutional email (
-              <span className="font-mono text-siet-primary dark:text-red-400 font-semibold">@sriniet.edu.in</span>
+              <span className="text-siet-primary dark:text-red-400 font-semibold">@sriniet.edu.in</span>
               ).
             </p>
           </div>
@@ -467,10 +469,10 @@ export default function Signup() {
 
               {/* Student Specific Fields */}
               {selectedRole === "student" && (
-                <div className="p-3.5 bg-muted/30 border border-border/80 rounded-2xl space-y-3">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-siet-primary flex items-center gap-1.5">
-                    <GraduationCap className="h-3.5 w-3.5" />
-                    Student Academic Information
+                <div className="p-3.5 bg-zinc-50 dark:bg-zinc-850/60 rounded-2xl space-y-3">
+                  <p className="text-xs font-semibold text-siet-primary dark:text-red-400 flex items-center gap-1.5">
+                    <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Student Academic Information</span>
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -479,14 +481,15 @@ export default function Signup() {
                       name="rollNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-[11px] font-bold text-muted-foreground uppercase">
+                          <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                             Roll Number
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="e.g. 256N5A0511"
                               maxLength={10}
-                              className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase font-mono tracking-wider"
+                              spellCheck={false}
+                              className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-700 uppercase tabular-nums"
                               {...field}
                             />
                           </FormControl>
@@ -578,25 +581,25 @@ export default function Signup() {
 
               {/* Faculty Specific Fields */}
               {selectedRole === "faculty" && (
-                <div className="p-4 bg-muted/30 border border-border/80 rounded-2xl space-y-3.5">
+                <div className="p-4 bg-zinc-50 dark:bg-zinc-850/60 rounded-2xl space-y-3.5">
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-siet-primary flex items-center gap-1.5">
-                      <GraduationCap className="h-3.5 w-3.5" />
-                      Class Advisory Assignment
+                    <p className="text-xs font-semibold text-siet-primary dark:text-red-400 flex items-center gap-1.5">
+                      <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Class Advisory Assignment</span>
                     </p>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-siet-primary/10 text-siet-primary font-semibold">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-md bg-siet-primary/10 dark:bg-red-500/15 text-siet-primary dark:text-red-400 font-semibold">
                       Auto-Assigned ID
                     </span>
                   </div>
 
                   {/* Auto-Generation Informational Banner */}
-                  <div className="p-3 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 rounded-xl flex items-start gap-2.5">
-                    <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                    <div className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                  <div className="p-3 bg-amber-500/10 dark:bg-amber-500/15 rounded-xl flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" aria-hidden="true" />
+                    <div className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
                       <span className="font-bold block text-amber-950 dark:text-amber-100">
                         Automatic Employee ID Generation
                       </span>
-                      Your official Faculty Employee ID (e.g. <span className="font-mono font-bold">F26{form.watch("department") || "AIML"}0S001</span>) will be automatically generated upon submission. You will use this ID to sign in.
+                      Your official Faculty Employee ID (e.g. <span className="tabular-nums font-bold">F26{form.watch("department") || "AIML"}0S001</span>) will be automatically generated upon submission. You will use this ID to sign in.
                     </div>
                   </div>
 
@@ -676,25 +679,25 @@ export default function Signup() {
 
               {/* HOD Specific Field */}
               {selectedRole === "hod" && (
-                <div className="p-4 bg-muted/30 border border-border/80 rounded-2xl space-y-3.5">
+                <div className="p-4 bg-zinc-50 dark:bg-zinc-850/60 rounded-2xl space-y-3.5">
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-siet-primary flex items-center gap-1.5">
-                      <Building2 className="h-3.5 w-3.5" />
-                      Department Executive Appointment
+                    <p className="text-xs font-semibold text-siet-primary dark:text-red-400 flex items-center gap-1.5">
+                      <Building2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Department Executive Appointment</span>
                     </p>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-siet-primary/10 text-siet-primary font-semibold">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-md bg-siet-primary/10 dark:bg-red-500/15 text-siet-primary dark:text-red-400 font-semibold">
                       Auto-Assigned ID
                     </span>
                   </div>
 
                   {/* Auto-Generation Informational Banner */}
-                  <div className="p-3 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 rounded-xl flex items-start gap-2.5">
-                    <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                    <div className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                  <div className="p-3 bg-amber-500/10 dark:bg-amber-500/15 rounded-xl flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" aria-hidden="true" />
+                    <div className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
                       <span className="font-bold block text-amber-950 dark:text-amber-100">
                         Automatic HOD Employee ID Generation
                       </span>
-                      Your official HOD Employee ID (e.g. <span className="font-mono font-bold">H26{form.watch("department") || "AIML"}0S001</span>) will be automatically generated upon submission. You will use this ID to sign in.
+                      Your official HOD Employee ID (e.g. <span className="tabular-nums font-bold">H26{form.watch("department") || "AIML"}0S001</span>) will be automatically generated upon submission. You will use this ID to sign in.
                     </div>
                   </div>
 
@@ -799,30 +802,46 @@ export default function Signup() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 text-xs font-bold text-white rounded-xl shadow-md hover:shadow-lg transition-all"
-                style={{
-                  background: "linear-gradient(135deg, #8B1A1A 0%, #6B1414 100%)",
-                }}
+                className="w-full h-11 text-xs font-semibold text-white rounded-xl bg-siet-primary hover:bg-siet-primary-dark transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-siet-primary focus-visible:ring-offset-2"
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                    <span>Registering Account...</span>
+                  <div className="flex items-center justify-center gap-2">
+                    <svg
+                      className="w-4 h-4 animate-spin text-white shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
+                    </svg>
+                    <span>Registering account…</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2">
                     <span>Create Official Account</span>
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </div>
                 )}
               </Button>
             </form>
           </Form>
 
-          <div className="mt-6 pt-4 border-t border-border/80 text-center">
-            <p className="text-xs text-muted-foreground">
+          <div className="mt-6 pt-4 text-center">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Already have an account?{" "}
-              <Link to="/login" className="text-siet-primary font-bold hover:underline">
+              <Link to="/login" className="text-siet-primary font-semibold hover:underline">
                 Sign in here
               </Link>
             </p>
@@ -832,13 +851,16 @@ export default function Signup() {
 
       {/* ═══ INSTITUTIONAL STAFF REGISTRATION ALLOCATION MODAL ═══ */}
       {registeredStaff && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 sm:p-8 space-y-6 text-zinc-900 dark:text-zinc-100 relative">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 animate-in fade-in duration-200"
+          data-ui="true"
+        >
+          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 space-y-6 text-zinc-900 dark:text-zinc-100 relative">
             <div className="text-center space-y-2">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 mb-1">
-                <ShieldCheck className="w-8 h-8" />
+                <ShieldCheck className="w-8 h-8" aria-hidden="true" />
               </div>
-              <h3 className="text-xl font-extrabold font-display text-zinc-900 dark:text-white">
+              <h3 className="text-xl font-bold font-display text-zinc-900 dark:text-white">
                 Staff Registration Received
               </h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -848,11 +870,11 @@ export default function Signup() {
 
             {/* Generated Employee ID Presentation Box */}
             <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/90 dark:border-zinc-700/80 text-center space-y-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-400 block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-400 block">
                 Your Official Employee ID
               </span>
               <div className="flex items-center justify-center gap-3">
-                <span className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-siet-primary dark:text-red-400 select-all">
+                <span className="text-2xl sm:text-3xl font-bold tracking-widest tabular-nums text-siet-primary dark:text-red-400 select-all">
                   {registeredStaff.employeeId}
                 </span>
                 <Button
@@ -864,12 +886,12 @@ export default function Signup() {
                 >
                   {copiedId ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                       <span className="text-emerald-600 dark:text-emerald-400">Copied</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="h-3.5 w-3.5" />
+                      <Copy className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>Copy</span>
                     </>
                   )}
@@ -882,7 +904,7 @@ export default function Signup() {
 
             {/* Notice of Pending Admin Clearance */}
             <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-3 text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
-              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
               <div>
                 <strong className="block text-amber-950 dark:text-amber-100 font-bold mb-0.5">
                   Mandatory Administrative Approval Required
@@ -895,13 +917,10 @@ export default function Signup() {
             <Button
               type="button"
               onClick={() => navigate("/login")}
-              className="w-full h-11 text-xs font-bold text-white rounded-xl shadow-md"
-              style={{
-                background: "linear-gradient(135deg, #8B1A1A 0%, #6B1414 100%)",
-              }}
+              className="w-full h-11 text-xs font-semibold text-white rounded-xl bg-siet-primary hover:bg-siet-primary-dark transition-colors duration-150"
             >
               <span>Proceed to Institutional Login</span>
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
             </Button>
           </div>
         </div>

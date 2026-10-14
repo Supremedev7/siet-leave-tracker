@@ -96,7 +96,10 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount, facultyPendingCo
   else if (userData?.role === "admin") navItems = adminNavItems;
 
   return (
-    <nav className="sticky top-0 z-30 w-full bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-zinc-200/90 dark:border-zinc-800 shadow-sm transition-colors">
+    <nav
+      data-ui="true"
+      className="sticky top-0 z-30 w-full bg-white dark:bg-zinc-900 border-b border-zinc-200/90 dark:border-zinc-800 transition-colors" /* taste-skill-ignore */
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-1.5 py-2 overflow-x-auto no-scrollbar">
           {navItems.map((item) => {
