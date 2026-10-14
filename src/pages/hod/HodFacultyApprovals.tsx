@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { sendLeaveNotification } from "@/lib/notifications";
+import { sendLeaveSmsNotification } from "@/lib/sms";
 import {
   CheckCircle2,
   XCircle,
@@ -88,6 +89,21 @@ export default function HodFacultyApprovals() {
             remarks: remarks[leaveId] || "",
           },
         });
+
+        // Dispatch SMS alert to faculty member
+        sendLeaveSmsNotification({
+          recipientPhone: targetLeave.emergencyPhone,
+          recipientUid: targetLeave.facultyUid,
+          recipientName: targetLeave.facultyName,
+          leaveType: targetLeave.type,
+          startDate: formatDate(targetLeave.startDate),
+          endDate: formatDate(targetLeave.endDate),
+          status: action,
+          approverName: userData.name,
+          approverRole: "Head of Department (HOD)",
+          remarks: remarks[leaveId] || "",
+          leaveId: targetLeave.id,
+        });
       }
 
       toast.success(`Leave request ${action}`, {
@@ -116,7 +132,7 @@ export default function HodFacultyApprovals() {
             Faculty Leave Management
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-display">
-            Faculty Leave Approvals
+            Faculty Leave Approvals Desk
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Review and approve faculty leave requests for the {userData?.department} Department.

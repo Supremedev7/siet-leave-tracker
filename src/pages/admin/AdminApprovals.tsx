@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Check, X, ShieldAlert, Phone, Paperclip } from "lucide-react";
 import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
 import { sendLeaveNotification } from "@/lib/notifications";
+import { sendLeaveSmsNotification } from "@/lib/sms";
 
 export default function AdminApprovals() {
   const { userData } = useAuth();
@@ -81,6 +82,21 @@ export default function AdminApprovals() {
           leaveType: selectedLeave.type,
           remarks: remarks.trim(),
         },
+      });
+
+      // Dispatch SMS alert to student's phone
+      sendLeaveSmsNotification({
+        recipientPhone: selectedLeave.emergencyPhone,
+        recipientUid: selectedLeave.studentUid,
+        recipientName: selectedLeave.studentName,
+        leaveType: selectedLeave.type,
+        startDate: String(selectedLeave.startDate || ""),
+        endDate: String(selectedLeave.endDate || ""),
+        status: action,
+        approverName: userData.name,
+        approverRole: "Principal / Executive Admin",
+        remarks: remarks.trim(),
+        leaveId: selectedLeave.id,
       });
 
       toast.success(action === "approved" ? "Institutional clearance granted!" : "Leave application rejected.");

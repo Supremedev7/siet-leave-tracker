@@ -41,6 +41,7 @@ import {
   CheckCircle,
   AlertTriangle,
   Forward,
+  Briefcase,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
@@ -112,6 +113,7 @@ const SIET_CHART_COLORS = [
 export default function HodDashboard() {
   const { userData } = useAuth();
   const [leaves, setLeaves] = useState<LeaveData[]>([]);
+  const [pendingFacultyCount, setPendingFacultyCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   // Modals state
@@ -187,6 +189,23 @@ export default function HodDashboard() {
 
     return () => unsubscribe();
   }, [userData]);
+
+  // Real-time listener for pending faculty leaves
+  useEffect(() => {
+    if (!userData?.department) return;
+
+    const qFaculty = query(
+      collection(db, "facultyLeaveRequests"),
+      where("department", "==", userData.department),
+      where("status", "==", "pending_hod")
+    );
+
+    const unsubFaculty = onSnapshot(qFaculty, (snapshot) => {
+      setPendingFacultyCount(snapshot.docs.length);
+    });
+
+    return () => unsubFaculty();
+  }, [userData?.department]);
 
   // Compute metrics
   const stats = useMemo(() => {
@@ -441,7 +460,7 @@ export default function HodDashboard() {
   };
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pendingCount={stats.pending} facultyPendingCount={pendingFacultyCount}>
       <div className="space-y-6 pb-12 max-w-7xl mx-auto">
         {/* Header with Quick Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-zinc-200/80 dark:border-zinc-800">
@@ -485,21 +504,32 @@ export default function HodDashboard() {
 
             <Link
               to="/hod/approvals"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md hover:shadow-lg transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-md hover:shadow-lg transition-all"
               style={{
                 background: "linear-gradient(135deg, #8B1A1A, #6B1414)",
               }}
             >
-              <Clock className="h-4 w-4" />
-              Pending Desk ({stats.pending})
+              <UserCheck className="h-4 w-4" />
+              <span>Student Leave Approvals ({stats.pending})</span>
+            </Link>
+
+            <Link
+              to="/hod/faculty-approvals"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-md hover:shadow-lg transition-all"
+              style={{
+                background: "linear-gradient(135deg, #B45309, #92400E)",
+              }}
+            >
+              <Briefcase className="h-4 w-4" />
+              <span>Faculty Leave Approvals ({pendingFacultyCount})</span>
             </Link>
           </div>
         </div>
 
         {/* KPI Stats Cards Grid */}
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[1, 2, 3, 4].map((n) => (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
               <div
                 key={n}
                 className="h-28 rounded-2xl bg-white border border-border/60 p-5 space-y-2 animate-pulse"
@@ -510,7 +540,7 @@ export default function HodDashboard() {
             ))}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
             <StatsCard
               title="Total Applications"
               value={stats.total}
@@ -520,10 +550,18 @@ export default function HodDashboard() {
             />
 
             <StatsCard
-              title="Pending HOD Review"
+              title="Pending Student Leaves"
               value={stats.pending}
-              subtitle={stats.pending > 0 ? "Requires your attention" : "All cleared"}
+              subtitle={stats.pending > 0 ? "Requires HOD action" : "All cleared"}
               icon={Clock}
+              variant="warning"
+            />
+
+            <StatsCard
+              title="Pending Faculty Leaves"
+              value={pendingFacultyCount}
+              subtitle={pendingFacultyCount > 0 ? "Faculty awaiting HOD" : "All cleared"}
+              icon={Briefcase}
               variant="warning"
             />
 

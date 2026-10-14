@@ -76,7 +76,7 @@ export default function FacultyDashboard() {
             <CardHeader className="p-4 pb-2">
               <CardTitle className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-amber-500" />
-                Pending Review
+                Pending Student Approvals
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -132,14 +132,14 @@ export default function FacultyDashboard() {
         {/* Quick Link Card */}
         <Card className="bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="font-bold text-base">You have {pendingLeaves.length} leave application(s) awaiting review</h3>
+            <h3 className="font-bold text-base">You have {pendingLeaves.length} student leave application(s) awaiting review</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               Review requests from your class students and approve 1-2 day leaves or forward longer requests to the Head of Department.
             </p>
           </div>
           <Button asChild className="bg-siet-primary hover:bg-siet-primary-dark text-white font-bold">
             <Link to="/faculty/approvals" className="flex items-center gap-2">
-              Go to Pending Queue <ArrowRight className="h-4 w-4" />
+              Review Student Approvals <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </Card>

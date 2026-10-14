@@ -219,15 +219,15 @@ export const Landing: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100 font-display">
-                        SIET Leave Intelligence
+                        SIET Leave Tracker
                       </h3>
                       <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">
-                        Live Attendance &amp; Absentee Engine
+                        Academic Leave &amp; Attendance Registry
                       </p>
                     </div>
                   </div>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                    Live Status: Online
+                    Portal Active
                   </span>
                 </div>
 
@@ -257,7 +257,7 @@ export const Landing: React.FC = () => {
                 {/* Calendar Legend Preview */}
                 <div className="space-y-2 pt-1">
                   <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block uppercase tracking-wide">
-                    Live Absentee Calendar Protocol
+                    Academic Calendar &amp; Attendance Legend
                   </span>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-center">

@@ -7,11 +7,13 @@ import { motion } from "framer-motion";
 interface PortalLayoutProps {
   children: React.ReactNode;
   pendingCount?: number;
+  facultyPendingCount?: number;
 }
 
 export const PortalLayout: React.FC<PortalLayoutProps> = ({
   children,
   pendingCount,
+  facultyPendingCount,
 }) => {
   return (
     <div className="min-h-screen bg-[#FAFAF9] dark:bg-zinc-950 flex flex-col text-zinc-900 dark:text-zinc-100 font-sans selection:bg-siet-primary/10 selection:text-siet-primary transition-colors">
@@ -22,7 +24,7 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({
       <TopMasthead />
 
       {/* Tier 2: Sticky Command Menubar */}
-      <Menubar pendingCount={pendingCount} />
+      <Menubar pendingCount={pendingCount} facultyPendingCount={facultyPendingCount} />
 
       {/* Main Academic Portal Workspace */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">

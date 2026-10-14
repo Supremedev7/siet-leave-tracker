@@ -6,6 +6,7 @@ import { auth, db } from "@/lib/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
+import { recordSessionLogin } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -200,6 +201,7 @@ export default function Signup() {
       }
 
       await setDoc(doc(db, "users", uid), userData);
+      await recordSessionLogin(uid, values.email, true);
 
       toast.success("Account created successfully!", {
         description: `Welcome to SIET Leave Tracker, ${values.name}`,

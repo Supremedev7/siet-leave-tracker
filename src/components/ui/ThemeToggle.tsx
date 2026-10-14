@@ -21,7 +21,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = "" }) => {
       className={`relative inline-flex items-center justify-center h-9 w-9 rounded-xl border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 ${
         isDark
           ? "bg-zinc-800/80 border-zinc-700/80 text-amber-400 hover:bg-zinc-700/80 hover:text-amber-300"
-          : "bg-white/90 border-zinc-200/90 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 shadow-sm"
+          : "bg-white/90 border-zinc-200/90 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 shadow-sm"
       } ${className}`}
     >
       <motion.div

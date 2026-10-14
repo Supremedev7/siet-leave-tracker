@@ -42,7 +42,7 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     case "cancelled":
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-zinc-200 dark:border-zinc-700 bg-zinc-100/70 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-wide border border-zinc-300 dark:border-zinc-700 bg-zinc-100/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0" />
           Cancelled

@@ -73,7 +73,7 @@ export const LeaveAuditStepper: React.FC<Props> = ({ leave }) => {
                   <p className="text-xs font-bold text-foreground">{stage.label}</p>
                   <p className="text-[10px] text-muted-foreground">
                     {chainEntry
-                      ? `${chainEntry.action.toUpperCase()} (${chainEntry.approverName})`
+                      ? `${chainEntry.action === "approved" ? "Approved by" : chainEntry.action === "rejected" ? "Rejected by" : "Forwarded by"} ${chainEntry.approverName}`
                       : isCurrent
                       ? "Under Review"
                       : "Pending Prior Stage"}
@@ -92,15 +92,18 @@ export const LeaveAuditStepper: React.FC<Props> = ({ leave }) => {
         <div className="pt-2 text-xs space-y-1.5 text-muted-foreground border-t border-zinc-200/50 dark:border-zinc-700/50">
           <p className="font-semibold text-foreground text-[11px]">Audit History:</p>
           {approvalChain.map((entry, i) => (
-            <div key={i} className="text-[11px] bg-white dark:bg-zinc-900 p-2 rounded-md border border-zinc-200/60 dark:border-zinc-800 space-y-0.5">
+            <div key={i} className="text-[11px] bg-white dark:bg-zinc-900 p-2.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800 space-y-1 shadow-xs">
               <div className="flex items-center justify-between font-semibold text-foreground">
-                <span>
-                  [{entry.stage.toUpperCase()}] {entry.approverName} ({entry.approverRole})
-                </span>
-                <span className={`px-1.5 py-0.2 rounded text-[10px] uppercase font-bold ${
-                  entry.action === "approved" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" :
-                  entry.action === "forwarded" ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300" :
-                  "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-bold text-foreground text-xs">{entry.approverName}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-medium">
+                    {entry.stage === "faculty" ? "Class Advisor" : entry.stage === "hod" ? "HOD" : "Principal"}
+                  </span>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
+                  entry.action === "approved" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300/40" :
+                  entry.action === "forwarded" ? "bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-300/40" :
+                  "bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300/40"
                 }`}>
                   {entry.action}
                 </span>

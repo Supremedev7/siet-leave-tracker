@@ -134,7 +134,7 @@ export default function StudentDashboard() {
           <StatsCard
             title="Under Review"
             value={loading ? "—" : pending}
-            subtitle="Pending HOD clearance"
+            subtitle="Pending advisor / HOD review"
             icon={Clock}
             variant="warning"
           />
@@ -148,7 +148,7 @@ export default function StudentDashboard() {
           <StatsCard
             title="Rejected Requests"
             value={loading ? "—" : rejected}
-            subtitle="Declined by HOD"
+            subtitle="Declined applications"
             icon={XCircle}
             variant="danger"
           />

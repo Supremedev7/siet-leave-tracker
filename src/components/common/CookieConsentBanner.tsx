@@ -199,8 +199,8 @@ export const CookieConsentBanner: React.FC = () => {
 
             {/* Bottom Action Bar */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-2">
-                <span>Sri Shakthi Institute of Engineering & Technology</span>
+              <div className="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300">Srinivasa Institute of Engineering & Technology (Autonomous)</span>
                 <span>•</span>
                 <span className="hover:underline cursor-pointer">Security Protocol v2.5</span>
               </div>
@@ -218,7 +218,7 @@ export const CookieConsentBanner: React.FC = () => {
                   <>
                     <button
                       onClick={handleAcceptEssential}
-                      className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors"
+                      className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
                     >
                       Essential Only
                     </button>

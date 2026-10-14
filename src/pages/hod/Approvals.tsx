@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { sendLeaveNotification } from "@/lib/notifications";
+import { sendLeaveSmsNotification } from "@/lib/sms";
 import {
   Check,
   X,
@@ -157,6 +158,21 @@ export default function Approvals() {
         },
       });
 
+      // Dispatch SMS alert to student's phone
+      sendLeaveSmsNotification({
+        recipientPhone: leave.emergencyPhone,
+        recipientUid: leave.studentUid,
+        recipientName: leave.studentName,
+        leaveType: leave.type,
+        startDate: safeFormatDate(leave.startDate),
+        endDate: safeFormatDate(leave.endDate),
+        status: "approved",
+        approverName: userData.name,
+        approverRole: "Head of Department (HOD)",
+        remarks: hodRemarksInput.trim() || "Approved by HOD",
+        leaveId: leave.id,
+      });
+
       toast.success(`Leave approved for ${leave.studentName}`, {
         description: `${leave.type} leave (${safeFormatDate(leave.startDate)} to ${safeFormatDate(leave.endDate)}) is authorized.`,
       });
@@ -276,6 +292,21 @@ export default function Approvals() {
         },
       });
 
+      // Dispatch SMS alert to student's phone
+      sendLeaveSmsNotification({
+        recipientPhone: rejectingLeave.emergencyPhone,
+        recipientUid: rejectingLeave.studentUid,
+        recipientName: rejectingLeave.studentName,
+        leaveType: rejectingLeave.type,
+        startDate: safeFormatDate(rejectingLeave.startDate),
+        endDate: safeFormatDate(rejectingLeave.endDate),
+        status: "rejected",
+        approverName: userData.name,
+        approverRole: "Head of Department (HOD)",
+        remarks: rejectionRemark.trim(),
+        leaveId: rejectingLeave.id,
+      });
+
       toast.error(`Leave rejected for ${rejectingLeave.studentName}`, {
         description: `Student notified with reason: "${rejectionRemark.trim()}"`,
       });
@@ -324,6 +355,21 @@ export default function Approvals() {
             updatedAt: serverTimestamp(),
             approvedBy: userData.uid,
             approverName: userData.name,
+          });
+
+          // Dispatch SMS for bulk approved leave
+          sendLeaveSmsNotification({
+            recipientPhone: leave.emergencyPhone,
+            recipientUid: leave.studentUid,
+            recipientName: leave.studentName,
+            leaveType: leave.type,
+            startDate: safeFormatDate(leave.startDate),
+            endDate: safeFormatDate(leave.endDate),
+            status: "approved",
+            approverName: userData.name,
+            approverRole: "Head of Department (HOD)",
+            remarks: "Bulk approved by HOD",
+            leaveId: leave.id,
           });
         } else {
           const chainEntry: ApprovalChainEntry = {
@@ -384,18 +430,18 @@ export default function Approvals() {
   });
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pendingCount={leaves.length}>
       <div className="space-y-6 pb-12">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 text-xs font-bold tracking-wide uppercase mb-2">
               <Clock className="h-3.5 w-3.5" />
-              Live Approvals Desk
+              Student Leave Approvals Desk
             </div>
             <div className="flex items-center gap-3">
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-display">
-                Pending Leave Requests
+                Student Leave Approvals
               </h2>
               <span className="px-3 py-0.5 rounded-full bg-siet-primary text-white text-xs font-bold">
                 {leaves.length} Pending

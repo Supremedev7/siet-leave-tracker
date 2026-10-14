@@ -23,9 +23,10 @@ interface MenubarItem {
 
 interface MenubarProps {
   pendingCount?: number;
+  facultyPendingCount?: number;
 }
 
-export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
+export const Menubar: React.FC<MenubarProps> = ({ pendingCount, facultyPendingCount }) => {
   const { userData } = useAuth();
   const location = useLocation();
 
@@ -39,7 +40,7 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
   const facultyNavItems: MenubarItem[] = [
     { name: "Class Overview", path: "/faculty/dashboard", icon: LayoutDashboard },
     {
-      name: "Pending Approvals",
+      name: "Student Pending Approvals",
       path: "/faculty/approvals",
       icon: CheckSquare,
       badge: pendingCount,
@@ -53,13 +54,18 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
   const hodNavItems: MenubarItem[] = [
     { name: "Department Analytics", path: "/hod/dashboard", icon: LayoutDashboard },
     {
-      name: "Pending Approvals",
+      name: "Student Leave Approvals",
       path: "/hod/approvals",
       icon: CheckSquare,
       badge: pendingCount,
     },
+    {
+      name: "Faculty Leave Approvals",
+      path: "/hod/faculty-approvals",
+      icon: Briefcase,
+      badge: facultyPendingCount,
+    },
     { name: "Leave Archive", path: "/hod/all-requests", icon: FileSpreadsheet },
-    { name: "Faculty Leaves", path: "/hod/faculty-approvals", icon: Briefcase },
     { name: "Faculty Allocation", path: "/hod/faculty", icon: Users },
     { name: "HOD Profile", path: "/hod/profile", icon: User },
   ];
@@ -97,7 +103,7 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount }) => {
                 className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition-colors whitespace-nowrap select-none ${
                   isActive
                     ? "text-siet-primary dark:text-red-400 font-bold"
-                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60"
+                    : "text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80"
                 }`}
               >
                 {/* Active Sliding Background Pill (Framer Motion) */}

@@ -107,7 +107,7 @@ export const NotificationBell: React.FC = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label="View notifications"
-        className="relative p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none"
+        className="relative p-2 rounded-xl text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-siet-primary/30"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (

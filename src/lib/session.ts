@@ -162,6 +162,15 @@ export function getActiveSessionToken(): string | null {
 }
 
 /**
+ * Validate active academic session token presence and integrity
+ */
+export function validateAcademicSession(): boolean {
+  const token = getActiveSessionToken();
+  if (!token) return false;
+  return token.startsWith("siet_sess_");
+}
+
+/**
  * Clean up session cookies and reset state upon logout
  */
 export function clearSessionData(): void {
@@ -173,3 +182,4 @@ export function clearSessionData(): void {
     // Ignore storage restriction
   }
 }
+

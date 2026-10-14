@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 import { UserRole } from "@/types/leave";
 import SIETLoadingScreen from "@/components/ui/LoadingScreen";
 import Login from "@/pages/auth/Login";
@@ -38,6 +40,12 @@ const ProtectedRoute: React.FC<{
   if (loading) return <SIETLoadingScreen />;
 
   if (!user || !userData) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Strictly enforce official institutional domain authorization (@sriniet.edu.in)
+  if (!user.email?.toLowerCase().endsWith("@sriniet.edu.in")) {
+    signOut(auth);
     return <Navigate to="/login" replace />;
   }
 

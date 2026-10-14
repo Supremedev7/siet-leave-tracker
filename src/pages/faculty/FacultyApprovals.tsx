@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Check, X, Forward, Clock, Phone } from "lucide-react";
 import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
 import { sendLeaveNotification } from "@/lib/notifications";
+import { sendLeaveSmsNotification } from "@/lib/sms";
 
 export default function FacultyApprovals() {
   const { userData } = useAuth();
@@ -122,6 +123,23 @@ export default function FacultyApprovals() {
         },
       });
 
+      // Dispatch SMS alert if final decision reached (approved or rejected)
+      if (action === "approved" || action === "rejected") {
+        sendLeaveSmsNotification({
+          recipientPhone: selectedLeave.emergencyPhone,
+          recipientUid: selectedLeave.studentUid,
+          recipientName: selectedLeave.studentName,
+          leaveType: selectedLeave.type,
+          startDate: String(selectedLeave.startDate || ""),
+          endDate: String(selectedLeave.endDate || ""),
+          status: action,
+          approverName: userData.name,
+          approverRole: "Class Advisor",
+          remarks: remarks.trim(),
+          leaveId: selectedLeave.id,
+        });
+      }
+
       toast.success(
         action === "approved"
           ? "Leave application approved!"
@@ -144,16 +162,16 @@ export default function FacultyApprovals() {
     <DashboardLayout pendingCount={leaves.length}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-black">Class Advisor Approvals</h1>
+          <h1 className="text-2xl font-black">Student Leave Approvals (Class Advisor)</h1>
           <p className="text-sm text-muted-foreground">
-            Reviewing leaves for {userData?.department} Year {userData?.assignedYear} Section {userData?.assignedSection}
+            Reviewing student leave applications for {userData?.department} Year {userData?.assignedYear} Section {userData?.assignedSection}
           </p>
         </div>
 
         {leaves.length === 0 ? (
           <Card className="p-8 text-center bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800">
             <Clock className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
-            <p className="font-bold">No pending leaves for your class</p>
+            <p className="font-bold">No pending student leave applications for your class</p>
             <p className="text-xs text-muted-foreground mt-1">All applications have been reviewed.</p>
           </Card>
         ) : (

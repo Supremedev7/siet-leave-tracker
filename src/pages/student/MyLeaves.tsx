@@ -352,7 +352,7 @@ export default function MyLeaves() {
                         variant="outline"
                         onClick={() => handleCancelLeave(leave.id)}
                         disabled={cancellingId === leave.id}
-                        className="h-8 text-xs text-zinc-600 hover:text-red-600 hover:bg-red-50 border-zinc-200"
+                        className="h-8 text-xs text-zinc-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 border-zinc-300 dark:border-zinc-700 font-medium"
                       >
                         <Ban className="h-3.5 w-3.5 mr-1" />
                         Withdraw
