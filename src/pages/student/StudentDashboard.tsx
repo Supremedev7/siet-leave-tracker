@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import {
   Clock, CheckCircle2, XCircle, FilePlus2,
-  CalendarDays, AlertCircle, ArrowRight, ShieldCheck, Info
+  CalendarDays, AlertCircle, ArrowRight, ShieldCheck
 } from "lucide-react";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { StatsCard } from "@/components/ui/StatsCard";
@@ -232,16 +232,6 @@ export default function StudentDashboard() {
                 Before attendance impact
               </span>
             </div>
-          </div>
-
-          <div className="p-3.5 rounded-xl border border-siet-primary/20 dark:border-red-900/30 bg-siet-primary/5 dark:bg-red-950/20 text-xs text-zinc-600 dark:text-zinc-300 flex items-start gap-2.5">
-            <Info className="h-4 w-4 text-siet-primary dark:text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-[11px] leading-relaxed">
-              <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">Institutional Rule:</strong>{" "}
-              Students are strictly permitted a maximum of 2 leaves per month without
-              condonation risk. On-Duty (OD) is not available for regular students. Any leaves beyond
-              2 days deduct from working attendance and jeopardize the mandatory 75% JNTUK examination threshold.
-            </p>
           </div>
         </div>
 

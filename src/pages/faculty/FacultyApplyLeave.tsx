@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Clock, Send, Info, Briefcase } from "lucide-react";
+import { Calendar, Clock, Send, Briefcase } from "lucide-react";
 import { differenceInCalendarDays, parseISO, isBefore, startOfToday } from "date-fns";
 
 const facultyLeaveSchema = z
@@ -139,17 +139,6 @@ export default function FacultyApplyLeave() {
             Submit your leave request to the Head of the Department for approval.
           </p>
         </div>
-
-        {/* Info Card */}
-        <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50 dark:border-blue-800/30">
-          <CardContent className="p-4 flex items-start gap-3">
-            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-blue-800 dark:text-blue-300 space-y-1">
-              <p className="font-semibold">Faculty Leave Approval Process</p>
-              <p>Your leave request will be reviewed and approved directly by the Head of the Department.</p>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Leave Form */}
         <Card className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800 shadow-xl shadow-zinc-500/5 dark:shadow-none">

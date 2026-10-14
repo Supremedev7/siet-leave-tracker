@@ -80,15 +80,11 @@ export const CookieConsentBanner: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-zinc-100 font-display flex items-center gap-2">
-                    Privacy & Academic Session Cookies
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                      GDPR & Campus Safe
-                    </span>
+                    Academic Session Cookies
                   </h3>
                   <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed max-w-2xl">
-                    We use strictly essential cookies and local session telemetry to protect your account,
-                    persist login credentials, and deliver real-time Firebase Push Notifications (FCM) for
-                    leave approvals and rejections.
+                    We use essential session cookies to maintain your authenticated academic login session
+                    and deliver leave status notifications.
                   </p>
                 </div>
               </div>
@@ -116,14 +112,14 @@ export const CookieConsentBanner: React.FC = () => {
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
                         <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                        Essential Auth
+                        Authentication
                       </span>
                       <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-500">
                         Required
                       </span>
                     </div>
                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                      Login session, token verification, and security telemetry.
+                      Login session verification and account security.
                     </p>
                   </div>
                   <div className="mt-2 text-right">
@@ -133,13 +129,13 @@ export const CookieConsentBanner: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 2. Notifications & FCM */}
+                {/* 2. Notifications */}
                 <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/50 dark:border-zinc-750/50 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
                         <Bell className="h-3.5 w-3.5 text-siet-primary dark:text-red-400" />
-                        FCM Push Alerts
+                        Status Alerts
                       </span>
                       <input
                         type="checkbox"
@@ -154,7 +150,7 @@ export const CookieConsentBanner: React.FC = () => {
                       />
                     </div>
                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                      Push notification tokens for real-time leave status alerts.
+                      Real-time alerts for leave approvals and status updates.
                     </p>
                   </div>
                   <div className="mt-2 text-right">
@@ -170,7 +166,7 @@ export const CookieConsentBanner: React.FC = () => {
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
                         <Cookie className="h-3.5 w-3.5 text-amber-500" />
-                        Device Memory
+                        Preferences
                       </span>
                       <input
                         type="checkbox"
@@ -185,7 +181,7 @@ export const CookieConsentBanner: React.FC = () => {
                       />
                     </div>
                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                      Keeps your dashboard logged in and stores dark/light mode preference.
+                      Stores theme selection and dashboard preferences.
                     </p>
                   </div>
                   <div className="mt-2 text-right">
@@ -201,8 +197,6 @@ export const CookieConsentBanner: React.FC = () => {
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
                 <span className="font-semibold text-zinc-700 dark:text-zinc-300">Srinivasa Institute of Engineering & Technology (Autonomous)</span>
-                <span>•</span>
-                <span className="hover:underline cursor-pointer">Security Protocol v2.5</span>
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">

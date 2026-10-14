@@ -22,7 +22,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Clock,
-  Info,
   Building2,
   X,
   History,
@@ -477,7 +476,6 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
           <span className="text-amber-800 dark:text-amber-300 font-medium">Pending Review</span>
         </div>
         <div className="flex items-center gap-1.5 ml-auto text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
-          <Info className="h-3.5 w-3.5 inline mr-1 text-zinc-400 dark:text-zinc-500" />
           Attendance % excludes approved leave days from total working days
         </div>
       </div>

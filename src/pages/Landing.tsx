@@ -226,9 +226,6 @@ export const Landing: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                    Portal Active
-                  </span>
                 </div>
 
                 {/* Simulated Attendance Scorecard */}
@@ -308,7 +305,7 @@ export const Landing: React.FC = () => {
             </h2>
             <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
               Eliminate paper leave slips and unrecorded absences with an automated,
-              verifiable digital authorization grid.
+              verifiable digital leave management and approval system.
             </p>
           </div>
 
@@ -370,7 +367,7 @@ export const Landing: React.FC = () => {
                 Academic Engineering Departments
               </h3>
               <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Multi-tenant departmental leave approval and attendance registries
+                Department-level leave approvals and attendance monitoring
               </p>
             </div>
             <span className="text-xs font-mono font-bold text-siet-primary dark:text-red-400 uppercase tracking-wider">

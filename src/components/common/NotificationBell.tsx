@@ -199,13 +199,6 @@ export const NotificationBell: React.FC = () => {
               ))
             )}
           </div>
-
-          {/* Footer */}
-          <div className="p-2 border-t border-zinc-200/80 dark:border-zinc-800 text-center bg-zinc-50/50 dark:bg-zinc-900/50">
-            <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-              Firebase Cloud Messaging (FCM) v1 Active
-            </span>
-          </div>
         </div>
       )}
     </div>

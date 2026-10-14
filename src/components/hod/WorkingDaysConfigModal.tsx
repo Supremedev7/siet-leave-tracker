@@ -9,7 +9,6 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Info,
   Loader2,
 } from "lucide-react";
 import { calculateDefaultWorkingDays } from "@/lib/attendance";
@@ -251,7 +250,7 @@ export const WorkingDaysConfigModal: React.FC<WorkingDaysConfigModalProps> = ({
           {/* Institutional Note */}
           <div className="p-3.5 rounded-xl border border-siet-primary/20 dark:border-red-900/40 bg-siet-primary/5 dark:bg-red-950/20 text-xs text-zinc-700 dark:text-zinc-300 space-y-1">
             <div className="flex items-center gap-1.5 font-bold text-siet-primary dark:text-red-400">
-              <Info className="h-4 w-4" />
+              <CalendarDays className="h-4 w-4" />
               <span>JNTUK Attendance Impact</span>
             </div>
             <p className="leading-relaxed text-zinc-600 dark:text-zinc-400 text-[11px]">

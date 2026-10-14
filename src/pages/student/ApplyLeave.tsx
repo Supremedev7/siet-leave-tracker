@@ -32,10 +32,9 @@ import { toast } from "sonner";
 import { 
   Calendar, 
   Clock, 
-  AlertCircle, 
   Paperclip, 
   Send, 
-  Info,
+  ShieldCheck,
   CheckCircle2
 } from "lucide-react";
 import { differenceInCalendarDays, parseISO, isBefore, startOfToday } from "date-fns";
@@ -390,24 +389,24 @@ export default function ApplyLeave() {
 
           {/* Right Sidebar: Rules & Guidelines */}
           <div className="space-y-4">
-            {/* Approval Hierarchy Card */}
+            {/* Approval Workflow Card */}
             <Card className="border-border/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground dark:text-zinc-100">
-                  <Info className="h-4 w-4 text-siet-primary dark:text-red-400" />
-                  Approval Hierarchy Matrix
+                  <ShieldCheck className="h-4 w-4 text-siet-primary dark:text-red-400" />
+                  Approval Workflow
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2.5 text-xs text-muted-foreground dark:text-zinc-400">
-                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+                <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
                   <p className="font-bold text-foreground">1 – 2 Days Leave</p>
                   <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Decided directly by your assigned Class Advisor.</p>
                 </div>
-                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+                <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
                   <p className="font-bold text-foreground">3 – 5 Days Leave</p>
                   <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Class Advisor recommends &amp; forwards to Department HOD.</p>
                 </div>
-                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+                <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
                   <p className="font-bold text-foreground">6+ Days Leave</p>
                   <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Class Advisor → HOD Endorsement → Principal Clearance.</p>
                 </div>
@@ -417,8 +416,8 @@ export default function ApplyLeave() {
             <Card className="border-border/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground dark:text-zinc-100">
-                  <Info className="h-4 w-4 text-siet-primary dark:text-red-400" />
-                  Leave Policies (SIET)
+                  <ShieldCheck className="h-4 w-4 text-siet-primary dark:text-red-400" />
+                  Academic Regulations
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-xs text-muted-foreground dark:text-zinc-400">
@@ -428,28 +427,16 @@ export default function ApplyLeave() {
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>On-Duty (OD) is not available for students; regular attendance is enforced.</span>
+                  <span>On-Duty (OD) is not available for regular students.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Minimum 75% overall semester attendance is mandatory per JNTUK norms.</span>
+                  <span>Minimum 75% overall semester attendance is required per JNTUK norms.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
                   <span>Approved digital passes must be verified at the campus gate upon departure.</span>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-amber-200 dark:border-amber-900/50 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-950/20">
-              <CardContent className="p-4 space-y-2">
-                <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-bold text-xs">
-                  <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                  Exam Season Notice
-                </div>
-                <p className="text-[11px] text-amber-900/80 dark:text-amber-300/80 leading-relaxed">
-                  Leaves during Mid-Term or Lab External examinations require direct written consent from the Principal's office.
-                </p>
               </CardContent>
             </Card>
           </div>
