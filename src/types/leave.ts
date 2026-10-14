@@ -1,4 +1,5 @@
 export type UserRole = "student" | "faculty" | "hod" | "admin";
+export type StaffApprovalStatus = "pending" | "approved" | "rejected";
 
 export type LeaveType = "Medical" | "Personal" | "Half-Day" | "Emergency" | "On-Duty";
 

@@ -42,6 +42,7 @@ import {
   AlertTriangle,
   Forward,
   Briefcase,
+  GraduationCap,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
@@ -113,6 +114,8 @@ const SIET_CHART_COLORS = [
 export default function HodDashboard() {
   const { userData } = useAuth();
   const [leaves, setLeaves] = useState<LeaveData[]>([]);
+  const [facultyLeaves, setFacultyLeaves] = useState<any[]>([]);
+  const [chartCohortFilter, setChartCohortFilter] = useState<"both" | "student" | "faculty">("both");
   const [pendingFacultyCount, setPendingFacultyCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -190,19 +193,30 @@ export default function HodDashboard() {
     return () => unsubscribe();
   }, [userData]);
 
-  // Real-time listener for pending faculty leaves
+  // Real-time listener for all department faculty leaves & pending approvals
   useEffect(() => {
     if (!userData?.department) return;
 
     const qFaculty = query(
       collection(db, "facultyLeaveRequests"),
-      where("department", "==", userData.department),
-      where("status", "==", "pending_hod")
+      where("department", "==", userData.department)
     );
 
-    const unsubFaculty = onSnapshot(qFaculty, (snapshot) => {
-      setPendingFacultyCount(snapshot.docs.length);
-    });
+    const unsubFaculty = onSnapshot(
+      qFaculty,
+      (snapshot) => {
+        const data: any[] = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as any),
+        }));
+        setFacultyLeaves(data);
+        const pendingCount = data.filter((fl) => fl.status === "pending_hod").length;
+        setPendingFacultyCount(pendingCount);
+      },
+      (error) => {
+        console.error("Error fetching faculty leaves:", error);
+      }
+    );
 
     return () => unsubFaculty();
   }, [userData?.department]);
@@ -262,7 +276,7 @@ export default function HodDashboard() {
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [leaves]);
 
-  // Chart: Monthly Trends (last 4 months)
+  // Chart: Monthly Trends (last 4 months) with Dynamic Cohort Filter (Students / Faculty / Both)
   const monthlyTrends = useMemo(() => {
     const monthsMap: Record<
       string,
@@ -276,20 +290,45 @@ export default function HodDashboard() {
       monthsMap[key] = { month: format(d, "MMM"), approved: 0, rejected: 0, pending: 0 };
     }
 
-    leaves.forEach((l) => {
-      const created = safeToDate(l.createdAt);
-      if (created) {
-        const key = format(created, "MMM yyyy");
-        if (monthsMap[key]) {
-          if (l.status === "approved") monthsMap[key].approved++;
-          else if (l.status === "rejected") monthsMap[key].rejected++;
-          else if (l.status === "pending") monthsMap[key].pending++;
+    // 1. Process Student Leaves (if "both" or "student")
+    if (chartCohortFilter === "both" || chartCohortFilter === "student") {
+      leaves.forEach((l) => {
+        const created = safeToDate(l.createdAt);
+        if (created) {
+          const key = format(created, "MMM yyyy");
+          if (monthsMap[key]) {
+            if (l.status === "approved") monthsMap[key].approved++;
+            else if (l.status === "rejected") monthsMap[key].rejected++;
+            else if (
+              l.status === "pending" ||
+              l.status === "pending_faculty" ||
+              l.status === "pending_hod" ||
+              l.status === "pending_admin"
+            ) {
+              monthsMap[key].pending++;
+            }
+          }
         }
-      }
-    });
+      });
+    }
+
+    // 2. Process Faculty Leaves (if "both" or "faculty")
+    if (chartCohortFilter === "both" || chartCohortFilter === "faculty") {
+      facultyLeaves.forEach((fl) => {
+        const created = safeToDate(fl.createdAt);
+        if (created) {
+          const key = format(created, "MMM yyyy");
+          if (monthsMap[key]) {
+            if (fl.status === "approved") monthsMap[key].approved++;
+            else if (fl.status === "rejected") monthsMap[key].rejected++;
+            else if (fl.status === "pending_hod") monthsMap[key].pending++;
+          }
+        }
+      });
+    }
 
     return Object.values(monthsMap);
-  }, [leaves]);
+  }, [leaves, facultyLeaves, chartCohortFilter]);
 
   // Aggregate unique students in the department with leave summaries
   const departmentStudents = useMemo(() => {
@@ -653,20 +692,69 @@ export default function HodDashboard() {
             </CardContent>
           </Card>
 
-          {/* Chart 2: Monthly Trends */}
+          {/* Chart 2: Monthly Trends with Dynamic Cohort Filter */}
           <Card className="border-border dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-bold text-foreground">
-                Monthly Request Volume
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Monthly volume breakdown by status
-              </CardDescription>
+            <CardHeader className="pb-3 border-b border-border/60">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                    <Users className="w-4 h-4 text-siet-primary dark:text-red-400" />
+                    Monthly Request Volume
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    {chartCohortFilter === "both"
+                      ? "Consolidated Student & Faculty metrics"
+                      : chartCohortFilter === "student"
+                      ? "Student leave metrics only"
+                      : "Faculty leave metrics only"}
+                  </CardDescription>
+                </div>
+
+                {/* Cohort Toggle Filter (Both / Student / Faculty) */}
+                <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700/80 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => setChartCohortFilter("both")}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all select-none ${
+                      chartCohortFilter === "both"
+                        ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 shadow-xs font-bold"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    }`}
+                  >
+                    <span>Both</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChartCohortFilter("student")}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all select-none ${
+                      chartCohortFilter === "student"
+                        ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 shadow-xs font-bold"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    }`}
+                  >
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    <span>Students</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChartCohortFilter("faculty")}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all select-none ${
+                      chartCohortFilter === "faculty"
+                        ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 shadow-xs font-bold"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    }`}
+                  >
+                    <Briefcase className="w-3.5 h-3.5" />
+                    <span>Faculty</span>
+                  </button>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="h-[280px]">
+
+            <CardContent className="h-[280px] pt-4">
               {monthlyTrends.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={monthlyTrends}>
+                <ResponsiveContainer width="100%" height="100%" key={`resp-${chartCohortFilter}`}>
+                  <BarChart data={monthlyTrends} key={`chart-${chartCohortFilter}`}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#52525b" strokeOpacity={0.3} />
                     <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                     <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
@@ -694,18 +782,21 @@ export default function HodDashboard() {
                       name="Approved"
                       fill="#16A34A"
                       radius={[4, 4, 0, 0]}
+                      animationDuration={600}
                     />
                     <Bar
                       dataKey="rejected"
                       name="Rejected"
                       fill="#DC2626"
                       radius={[4, 4, 0, 0]}
+                      animationDuration={600}
                     />
                     <Bar
                       dataKey="pending"
                       name="Pending"
                       fill="#F7941D"
                       radius={[4, 4, 0, 0]}
+                      animationDuration={600}
                     />
                   </BarChart>
                 </ResponsiveContainer>

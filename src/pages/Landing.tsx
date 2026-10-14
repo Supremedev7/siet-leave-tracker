@@ -375,14 +375,15 @@ export const Landing: React.FC = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             {[
               { code: "CSE", name: "Computer Science" },
+              { code: "AIML", name: "AI & Machine Learning" },
               { code: "ECE", name: "Electronics & Comm." },
               { code: "EEE", name: "Electrical & Electronics" },
               { code: "MECH", name: "Mechanical Engg." },
               { code: "CIVIL", name: "Civil Engineering" },
-              { code: "AI&DS", name: "AI & Data Science" },
+              { code: "S&H", name: "Science & Humanities" },
             ].map((dept) => (
               <div
                 key={dept.code}

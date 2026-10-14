@@ -11,6 +11,7 @@ import {
   User,
   Users,
   ShieldAlert,
+  ShieldCheck,
   Briefcase,
 } from "lucide-react";
 
@@ -72,6 +73,12 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount, facultyPendingCo
 
   const adminNavItems: MenubarItem[] = [
     { name: "Institution Overview", path: "/admin/dashboard", icon: LayoutDashboard },
+    {
+      name: "Staff Approvals",
+      path: "/admin/staff-approvals",
+      icon: ShieldCheck,
+      badge: facultyPendingCount,
+    },
     {
       name: "Executive Approvals",
       path: "/admin/approvals",

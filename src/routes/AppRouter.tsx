@@ -25,6 +25,7 @@ import HodProfile from "@/pages/hod/Profile";
 import HodFacultyApprovals from "@/pages/hod/HodFacultyApprovals";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminApprovals from "@/pages/admin/AdminApprovals";
+import AdminStaffApprovals from "@/pages/admin/AdminStaffApprovals";
 import AdminAllRequests from "@/pages/admin/AdminAllRequests";
 import AdminManageUsers from "@/pages/admin/AdminManageUsers";
 import AdminProfile from "@/pages/admin/AdminProfile";
@@ -45,6 +46,16 @@ const ProtectedRoute: React.FC<{
 
   // Strictly enforce official institutional domain authorization (@sriniet.edu.in)
   if (!user.email?.toLowerCase().endsWith("@sriniet.edu.in")) {
+    signOut(auth);
+    return <Navigate to="/login" replace />;
+  }
+
+  // Strictly enforce staff account approval gate
+  if (
+    (userData.role === "faculty" || userData.role === "hod") &&
+    userData.approvalStatus &&
+    userData.approvalStatus !== "approved"
+  ) {
     signOut(auth);
     return <Navigate to="/login" replace />;
   }
@@ -255,6 +266,16 @@ export const AppRouter = () => {
             <ProtectedRoute allowedRole="admin">
               <PageTransition>
                 <AdminApprovals />
+              </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/staff-approvals"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <PageTransition>
+                <AdminStaffApprovals />
               </PageTransition>
             </ProtectedRoute>
           }

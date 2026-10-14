@@ -14,6 +14,7 @@ export interface UserData {
   role: UserRole;
   department: string;
   phone: string;
+  approvalStatus?: "pending" | "approved" | "rejected";
   createdAt?: any;
   updatedAt?: any;
   // Student specific

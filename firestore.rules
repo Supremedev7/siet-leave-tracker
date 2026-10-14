@@ -88,6 +88,19 @@ service cloud.firestore {
       allow delete: if isAuthorized() && (resource.data.recipientUid == request.auth.uid || isAdmin());
     }
 
+    // Staff Lookup index for Employee ID -> email resolution during login
+    match /staffLookups/{employeeId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if isAuthorized() && (isAdmin() || request.auth.uid == resource.data.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Atomic Staff ID Counters
+    match /staffCounters/{counterId} {
+      allow read, write: if true;
+    }
+
     // SMS Notification Audit Logs
     match /sms_logs/{logId} {
       allow read: if isAuthorized() && (

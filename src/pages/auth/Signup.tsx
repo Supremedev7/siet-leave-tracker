@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { auth, db } from "@/lib/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { recordSessionLogin } from "@/lib/session";
@@ -30,18 +30,24 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
+  ShieldCheck,
+  Copy,
+  Check,
+  Clock,
+  Building2,
 } from "lucide-react";
 import { sietEmblem } from "@/components/branding/SIETLogo";
 import { AuthDynamicSidePanel } from "@/components/auth/AuthDynamicSidePanel";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { validateStudentRegistration } from "@/lib/validation/academicAuth";
+import { generateEmployeeId, createStaffLookup } from "@/lib/idGenerator";
 
 const signupSchema = z
   .object({
     role: z.enum(["student", "faculty", "hod"]),
     email: z
       .string()
-      .email("Valid email required")
-      .endsWith("@sriniet.edu.in", "Must use official @sriniet.edu.in email"),
+      .email("Valid email required"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm password is required"),
     name: z.string().min(2, "Full name is required"),
@@ -50,7 +56,7 @@ const signupSchema = z
       .min(10, "Valid 10-digit phone required")
       .max(10, "Maximum 10 digits")
       .regex(/^[0-9]+$/, "Digits only"),
-    department: z.enum(["CSE", "ECE", "EEE", "ME", "CE", "S&H"]),
+    department: z.enum(["CSE", "AIML", "ECE", "EEE", "ME", "CE", "S&H"]),
 
     // Student specific
     rollNumber: z.string().optional(),
@@ -72,11 +78,12 @@ const signupSchema = z
     }
 
     if (data.role === "student") {
-      if (!data.rollNumber || data.rollNumber.trim().length < 5) {
+      const studentVal = validateStudentRegistration(data.email, data.rollNumber);
+      if (!studentVal.isValid && studentVal.error) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Roll number is required (e.g. 21B91A0501)",
-          path: ["rollNumber"],
+          message: studentVal.error,
+          path: [studentVal.error.toLowerCase().includes("roll number") && !studentVal.error.toLowerCase().includes("email") ? "rollNumber" : "email"],
         });
       }
       if (!data.year) {
@@ -100,35 +107,43 @@ const signupSchema = z
           path: ["section"],
         });
       }
-    } else if (data.role === "faculty") {
-      if (!data.employeeId || data.employeeId.trim().length < 2) {
+    } else {
+      // Faculty & HOD strict institutional email check
+      const cleanEmail = data.email.trim().toLowerCase();
+      if (!cleanEmail.endsWith("@sriniet.edu.in")) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Employee ID is required for faculty",
-          path: ["employeeId"],
+          message: "Staff must register using official college email (@sriniet.edu.in)",
+          path: ["email"],
         });
       }
-      if (!data.year) {
+      if (
+        cleanEmail.endsWith("@gmail.com") ||
+        cleanEmail.endsWith("@yahoo.com") ||
+        cleanEmail.endsWith("@outlook.com")
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Select assigned class year",
-          path: ["year"],
+          message: "Personal email domains are strictly prohibited for institutional accounts.",
+          path: ["email"],
         });
       }
-      if (!data.section) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Select assigned class section",
-          path: ["section"],
-        });
-      }
-    } else if (data.role === "hod") {
-      if (!data.employeeId || data.employeeId.trim().length < 2) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Employee ID is required for HODs",
-          path: ["employeeId"],
-        });
+
+      if (data.role === "faculty") {
+        if (!data.year) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Select assigned class year",
+            path: ["year"],
+          });
+        }
+        if (!data.section) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Select assigned class section",
+            path: ["section"],
+          });
+        }
       }
     }
   });
@@ -139,6 +154,13 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [registeredStaff, setRegisteredStaff] = useState<{
+    employeeId: string;
+    name: string;
+    role: string;
+    department: string;
+  } | null>(null);
+  const [copiedId, setCopiedId] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<SignupFormValues>({
@@ -161,6 +183,40 @@ export default function Signup() {
   });
 
   const selectedRole = form.watch("role");
+  const watchedEmail = form.watch("email");
+  const watchedRollNumber = form.watch("rollNumber");
+
+  // Keep roll number and email synced for student role
+  useEffect(() => {
+    if (selectedRole === "student" && watchedEmail) {
+      const trimmed = watchedEmail.trim();
+      if (trimmed.includes("@")) {
+        const prefix = trimmed.split("@")[0].toUpperCase();
+        if (prefix.length <= 10 && prefix !== form.getValues("rollNumber")) {
+          form.setValue("rollNumber", prefix, { shouldValidate: false });
+        }
+      }
+    }
+  }, [watchedEmail, selectedRole, form]);
+
+  useEffect(() => {
+    if (selectedRole === "student" && watchedRollNumber) {
+      const cleanRoll = watchedRollNumber.trim().toUpperCase();
+      const currentEmail = form.getValues("email") || "";
+      const expectedEmail = `${cleanRoll.toLowerCase()}@sriniet.edu.in`;
+      if (cleanRoll.length >= 2 && currentEmail !== expectedEmail) {
+        form.setValue("email", expectedEmail, { shouldValidate: false });
+      }
+    }
+  }, [watchedRollNumber, selectedRole, form]);
+
+  const handleCopyId = () => {
+    if (!registeredStaff?.employeeId) return;
+    navigator.clipboard.writeText(registeredStaff.employeeId);
+    setCopiedId(true);
+    toast.success("Employee ID copied to clipboard!");
+    setTimeout(() => setCopiedId(false), 2500);
+  };
 
   const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
@@ -168,46 +224,83 @@ export default function Signup() {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        values.email,
+        values.email.trim().toLowerCase(),
         values.password
       );
       const uid = userCredential.user.uid;
 
       const userData: any = {
         uid,
-        email: values.email,
-        name: values.name,
+        email: values.email.trim().toLowerCase(),
+        name: values.name.trim(),
         role: values.role,
         department: values.department,
-        phone: values.phone,
+        phone: values.phone.trim(),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
 
       if (values.role === "student") {
-        userData.rollNumber = values.rollNumber?.toUpperCase().trim();
+        const rollUpper = values.rollNumber?.toUpperCase().trim() || values.email.split("@")[0].toUpperCase().trim();
+        userData.rollNumber = rollUpper;
         userData.year = values.year ? Number(values.year) : 1;
         userData.semester = values.semester ? Number(values.semester) : 1;
         userData.section = values.section?.toUpperCase().trim() || "A";
-      } else if (values.role === "faculty") {
-        userData.employeeId = values.employeeId?.toUpperCase().trim();
-        userData.assignedYear = values.year ? Number(values.year) : 1;
-        userData.assignedSection = values.section?.toUpperCase().trim() || "A";
-        userData.designation = "Class Advisor";
-        userData.degrees = values.degrees?.trim() || "";
+        userData.approvalStatus = "approved";
+
+        await setDoc(doc(db, "users", uid), userData);
+        await recordSessionLogin(uid, values.email, true);
+
+        toast.success("Account created successfully!", {
+          description: `Welcome to SIET Leave Tracker, ${values.name}`,
+        });
+
+        navigate(`/${values.role}/dashboard`);
       } else {
-        userData.employeeId = values.employeeId?.toUpperCase().trim();
+        // Faculty & HOD: Auto-generate unique Employee ID and set Pending Approval
+        const generatedEmployeeId = await generateEmployeeId(values.role, values.department);
+
+        userData.employeeId = generatedEmployeeId;
+        userData.approvalStatus = "pending";
         userData.degrees = values.degrees?.trim() || "";
+
+        if (values.role === "faculty") {
+          userData.assignedYear = values.year ? Number(values.year) : 1;
+          userData.assignedSection = values.section?.toUpperCase().trim() || "A";
+          userData.designation = "Class Advisor";
+        } else {
+          userData.designation = "Head of Department";
+        }
+
+        // Save User Profile Document
+        await setDoc(doc(db, "users", uid), userData);
+
+        // Index in staffLookups for ID-based login resolution
+        await createStaffLookup({
+          employeeId: generatedEmployeeId,
+          email: values.email.trim().toLowerCase(),
+          role: values.role,
+          department: values.department,
+          name: values.name.trim(),
+          uid,
+          approvalStatus: "pending",
+        });
+
+        // Sign out immediately so pending user cannot access authenticated routes
+        await signOut(auth);
+
+        // Display confirmation modal with generated Employee ID
+        setRegisteredStaff({
+          employeeId: generatedEmployeeId,
+          name: values.name.trim(),
+          role: values.role === "hod" ? "Head of Department" : "Faculty Advisor",
+          department: values.department,
+        });
+
+        toast.success("Staff Registration Submitted!", {
+          description: `Allocated Employee ID: ${generatedEmployeeId}`,
+        });
       }
-
-      await setDoc(doc(db, "users", uid), userData);
-      await recordSessionLogin(uid, values.email, true);
-
-      toast.success("Account created successfully!", {
-        description: `Welcome to SIET Leave Tracker, ${values.name}`,
-      });
-
-      navigate(`/${values.role}/dashboard`);
     } catch (err: any) {
       console.error("Signup error:", err);
       let friendlyMsg = "Failed to create account. Please try again.";
@@ -314,6 +407,7 @@ export default function Signup() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="CSE">CSE - Computer Science</SelectItem>
+                          <SelectItem value="AIML">AIML - Artificial Intelligence &amp; ML</SelectItem>
                           <SelectItem value="ECE">ECE - Electronics &amp; Comm.</SelectItem>
                           <SelectItem value="EEE">EEE - Electrical &amp; Electronics</SelectItem>
                           <SelectItem value="ME">ME - Mechanical Engg.</SelectItem>
@@ -390,8 +484,9 @@ export default function Signup() {
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="e.g. 21B91A0501"
-                              className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase"
+                              placeholder="e.g. 256N5A0511"
+                              maxLength={10}
+                              className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase font-mono tracking-wider"
                               {...field}
                             />
                           </FormControl>
@@ -483,30 +578,28 @@ export default function Signup() {
 
               {/* Faculty Specific Fields */}
               {selectedRole === "faculty" && (
-                <div className="p-3.5 bg-muted/30 border border-border/80 rounded-2xl space-y-3">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-siet-primary flex items-center gap-1.5">
-                    <GraduationCap className="h-3.5 w-3.5" />
-                    Class Advisory Assignment
-                  </p>
-                  <FormField
-                    control={form.control}
-                    name="employeeId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-[11px] font-bold text-muted-foreground uppercase">
-                          Faculty Employee ID
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g. FAC-CSE-102"
-                            className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-[11px]" />
-                      </FormItem>
-                    )}
-                  />
+                <div className="p-4 bg-muted/30 border border-border/80 rounded-2xl space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-siet-primary flex items-center gap-1.5">
+                      <GraduationCap className="h-3.5 w-3.5" />
+                      Class Advisory Assignment
+                    </p>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-siet-primary/10 text-siet-primary font-semibold">
+                      Auto-Assigned ID
+                    </span>
+                  </div>
+
+                  {/* Auto-Generation Informational Banner */}
+                  <div className="p-3 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 rounded-xl flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                    <div className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                      <span className="font-bold block text-amber-950 dark:text-amber-100">
+                        Automatic Employee ID Generation
+                      </span>
+                      Your official Faculty Employee ID (e.g. <span className="font-mono font-bold">F26{form.watch("department") || "AIML"}0S001</span>) will be automatically generated upon submission. You will use this ID to sign in.
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <FormField
                       control={form.control}
@@ -583,37 +676,39 @@ export default function Signup() {
 
               {/* HOD Specific Field */}
               {selectedRole === "hod" && (
-                <div className="p-3.5 bg-muted/30 border border-border/80 rounded-2xl">
-                  <FormField
-                    control={form.control}
-                    name="employeeId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
-                          Faculty Employee ID
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g. FAC-CSE-001"
-                            className="h-10 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-[11px]" />
-                      </FormItem>
-                    )}
-                  />
+                <div className="p-4 bg-muted/30 border border-border/80 rounded-2xl space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-siet-primary flex items-center gap-1.5">
+                      <Building2 className="h-3.5 w-3.5" />
+                      Department Executive Appointment
+                    </p>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-siet-primary/10 text-siet-primary font-semibold">
+                      Auto-Assigned ID
+                    </span>
+                  </div>
+
+                  {/* Auto-Generation Informational Banner */}
+                  <div className="p-3 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 rounded-xl flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                    <div className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                      <span className="font-bold block text-amber-950 dark:text-amber-100">
+                        Automatic HOD Employee ID Generation
+                      </span>
+                      Your official HOD Employee ID (e.g. <span className="font-mono font-bold">H26{form.watch("department") || "AIML"}0S001</span>) will be automatically generated upon submission. You will use this ID to sign in.
+                    </div>
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="degrees"
                     render={({ field }) => (
-                      <FormItem className="mt-3">
+                      <FormItem>
                         <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
-                          Degrees / Qualifications
+                          Degrees / Academic Credentials
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="e.g. M.Tech, Ph.D, B.Tech"
+                            placeholder="e.g. M.Tech, Ph.D, FIE"
                             className="h-10 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700"
                             {...field}
                           />
@@ -734,6 +829,83 @@ export default function Signup() {
           </div>
         </div>
       </div>
+
+      {/* ═══ INSTITUTIONAL STAFF REGISTRATION ALLOCATION MODAL ═══ */}
+      {registeredStaff && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 sm:p-8 space-y-6 text-zinc-900 dark:text-zinc-100 relative">
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 mb-1">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-extrabold font-display text-zinc-900 dark:text-white">
+                Staff Registration Received
+              </h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Institutional credentials allocated for {registeredStaff.name} ({registeredStaff.role})
+              </p>
+            </div>
+
+            {/* Generated Employee ID Presentation Box */}
+            <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/90 dark:border-zinc-700/80 text-center space-y-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-400 block">
+                Your Official Employee ID
+              </span>
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-2xl sm:text-3xl font-black font-mono tracking-widest text-siet-primary dark:text-red-400 select-all">
+                  {registeredStaff.employeeId}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyId}
+                  className="h-8 px-2.5 text-xs font-semibold gap-1.5 rounded-lg border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                >
+                  {copiedId ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-emerald-600 dark:text-emerald-400">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                Department: <strong className="text-zinc-800 dark:text-zinc-200">{registeredStaff.department}</strong>
+              </p>
+            </div>
+
+            {/* Notice of Pending Admin Clearance */}
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-3 text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
+              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="block text-amber-950 dark:text-amber-100 font-bold mb-0.5">
+                  Mandatory Administrative Approval Required
+                </strong>
+                Your account is currently in <strong>Pending</strong> status. The Central Administrator must verify and approve your registration before you can log in. Use this <strong>Employee ID</strong> and your password once approved.
+              </div>
+            </div>
+
+            {/* Primary Action Button */}
+            <Button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="w-full h-11 text-xs font-bold text-white rounded-xl shadow-md"
+              style={{
+                background: "linear-gradient(135deg, #8B1A1A 0%, #6B1414 100%)",
+              }}
+            >
+              <span>Proceed to Institutional Login</span>
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

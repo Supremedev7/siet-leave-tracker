@@ -1,10 +1,11 @@
 export const DEPARTMENTS = [
-  { code: "CSE", name: "Computer Science & Engineering" },
-  { code: "ECE", name: "Electronics & Communication Engineering" },
-  { code: "EEE", name: "Electrical & Electronics Engineering" },
-  { code: "ME",  name: "Mechanical Engineering" },
-  { code: "CE",  name: "Civil Engineering" },
-  { code: "S&H", name: "Science & Humanities" },
+  { code: "CSE",  name: "Computer Science & Engineering" },
+  { code: "AIML", name: "Artificial Intelligence & Machine Learning" },
+  { code: "ECE",  name: "Electronics & Communication Engineering" },
+  { code: "EEE",  name: "Electrical & Electronics Engineering" },
+  { code: "ME",   name: "Mechanical Engineering" },
+  { code: "CE",   name: "Civil Engineering" },
+  { code: "S&H",  name: "Science & Humanities" },
 ] as const;
 
 export const ACADEMIC_YEARS = [1, 2, 3, 4] as const;
