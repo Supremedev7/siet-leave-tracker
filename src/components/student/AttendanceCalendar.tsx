@@ -229,10 +229,10 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
               <span
                 className={`text-2xl sm:text-3xl font-extrabold font-mono leading-none ${
                   activeAttendance.status === "compliant"
-                    ? "text-emerald-700"
+                    ? "text-emerald-700 dark:text-emerald-400"
                     : activeAttendance.status === "condonation"
-                    ? "text-amber-600"
-                    : "text-rose-700"
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-rose-700 dark:text-rose-400"
                 }`}
               >
                 {activeAttendance.percentage}%
@@ -242,19 +242,19 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
             {/* Status Tag */}
             <div className="space-y-1">
               {activeAttendance.status === "compliant" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   JNTUK Norm Met (≥75%)
                 </span>
               )}
               {activeAttendance.status === "condonation" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
                   <AlertTriangle className="h-3.5 w-3.5" />
                   Condonation Zone (65%–74%)
                 </span>
               )}
               {activeAttendance.status === "detention" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
                   <AlertTriangle className="h-3.5 w-3.5" />
                   Detention Risk (&lt;65%)
                 </span>

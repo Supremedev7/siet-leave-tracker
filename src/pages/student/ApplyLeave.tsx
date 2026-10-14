@@ -279,9 +279,9 @@ export default function ApplyLeave() {
 
                     {/* Duration Preview Box */}
                     {totalDays > 0 && (
-                      <div className="p-3.5 rounded-xl bg-siet-primary/5 border border-siet-primary/20 flex items-center justify-between text-xs animate-fade-up">
+                      <div className="p-3.5 rounded-xl bg-siet-primary/5 dark:bg-red-500/10 border border-siet-primary/20 dark:border-red-500/30 flex items-center justify-between text-xs animate-fade-up">
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-siet-primary" />
+                          <Clock className="h-4 w-4 text-siet-primary dark:text-red-400" />
                           <span className="font-medium text-foreground">Calculated Duration:</span>
                         </div>
                         <span className="font-bold px-2.5 py-0.5 rounded-full bg-siet-primary text-white">

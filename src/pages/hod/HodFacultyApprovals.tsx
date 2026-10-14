@@ -127,7 +127,7 @@ export default function HodFacultyApprovals() {
       <div className="space-y-6 max-w-4xl mx-auto pb-12">
         {/* Header */}
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-siet-primary/10 text-siet-primary text-xs font-bold tracking-wide uppercase mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-siet-primary/10 dark:bg-red-500/10 text-siet-primary dark:text-red-400 text-xs font-bold tracking-wide uppercase mb-2">
             <Shield className="h-3.5 w-3.5" />
             Faculty Leave Management
           </div>
@@ -231,7 +231,7 @@ export default function HodFacultyApprovals() {
                       placeholder="Add remarks or instructions..."
                       value={remarks[leave.id] || ""}
                       onChange={(e) => setRemarks({ ...remarks, [leave.id]: e.target.value })}
-                      className="min-h-[60px] text-xs bg-muted/20 dark:bg-zinc-800/60 border-border resize-none"
+                      className="min-h-[60px] text-xs bg-muted/20 dark:bg-zinc-800/60 border-border dark:border-zinc-700 resize-none text-foreground"
                     />
                   </div>
 

@@ -58,7 +58,7 @@ export default function FacultyDashboard() {
     <DashboardLayout pendingCount={pendingLeaves.length}>
       <div className="space-y-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-siet-primary/10 text-siet-primary text-xs font-bold tracking-wide uppercase mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-siet-primary/10 dark:bg-red-500/10 text-siet-primary dark:text-red-400 text-xs font-bold tracking-wide uppercase mb-2">
             <Users className="h-3.5 w-3.5" />
             Class Advisor Portal
           </div>

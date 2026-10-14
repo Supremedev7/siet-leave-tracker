@@ -40,7 +40,7 @@ export const SIETLoadingScreen: React.FC = () => {
             style={{ width: "60%" }}
           />
         </div>
-        <p className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold">
+        <p className="text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-semibold">
           Authenticating Academic Session...
         </p>
       </motion.div>

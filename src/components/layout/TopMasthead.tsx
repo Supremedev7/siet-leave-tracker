@@ -115,7 +115,7 @@ export const TopMasthead: React.FC = () => {
                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono truncate">
                       {userData?.email}
                     </p>
-                    <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-siet-primary/10 dark:bg-red-500/10 text-siet-primary dark:text-red-400 rounded font-mono">
+                    <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-siet-primary/10 dark:bg-red-500/15 text-siet-primary dark:text-red-400 rounded-md border border-siet-primary/20 dark:border-red-500/30">
                       {userData?.role === "admin"
                         ? "Central Administrator"
                         : userData?.role === "hod"

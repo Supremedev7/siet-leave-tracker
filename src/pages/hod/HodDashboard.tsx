@@ -532,7 +532,7 @@ export default function HodDashboard() {
             {[1, 2, 3, 4, 5, 6].map((n) => (
               <div
                 key={n}
-                className="h-28 rounded-2xl bg-white border border-border/60 p-5 space-y-2 animate-pulse"
+                className="h-28 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 p-5 space-y-2 animate-pulse"
               >
                 <div className="h-3 bg-muted rounded w-1/3" />
                 <div className="h-7 bg-muted rounded w-1/2" />

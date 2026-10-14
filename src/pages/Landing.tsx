@@ -297,7 +297,7 @@ export const Landing: React.FC = () => {
       <section id="policy" className="py-16 bg-white dark:bg-zinc-900 border-y border-zinc-200/80 dark:border-zinc-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-siet-primary dark:text-red-400 font-mono">
+            <span className="text-xs font-bold uppercase tracking-wider text-siet-primary dark:text-red-400">
               Academic Regulatory Framework
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-zinc-100 font-display">
@@ -370,7 +370,7 @@ export const Landing: React.FC = () => {
                 Department-level leave approvals and attendance monitoring
               </p>
             </div>
-            <span className="text-xs font-mono font-bold text-siet-primary dark:text-red-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-siet-primary dark:text-red-400 uppercase tracking-wider">
               Autonomous Curricula
             </span>
           </div>

@@ -264,7 +264,7 @@ export default function Signup() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-xs text-rose-700 dark:text-rose-300 font-medium">
               {error}
             </div>
           )}
@@ -391,7 +391,7 @@ export default function Signup() {
                           <FormControl>
                             <Input
                               placeholder="e.g. 21B91A0501"
-                              className="h-9 text-xs bg-white border-border uppercase"
+                              className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase"
                               {...field}
                             />
                           </FormControl>
@@ -411,7 +411,7 @@ export default function Signup() {
                             </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="h-9 text-xs bg-white border-border">
+                                <SelectTrigger className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700">
                                   <SelectValue placeholder="Yr" />
                                 </SelectTrigger>
                               </FormControl>
@@ -437,7 +437,7 @@ export default function Signup() {
                             </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="h-9 text-xs bg-white border-border">
+                                <SelectTrigger className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700">
                                   <SelectValue placeholder="Sem" />
                                 </SelectTrigger>
                               </FormControl>
@@ -461,7 +461,7 @@ export default function Signup() {
                             </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="h-9 text-xs bg-white border-border">
+                                <SelectTrigger className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700">
                                   <SelectValue placeholder="Sec" />
                                 </SelectTrigger>
                               </FormControl>
@@ -499,7 +499,7 @@ export default function Signup() {
                         <FormControl>
                           <Input
                             placeholder="e.g. FAC-CSE-102"
-                            className="h-9 text-xs bg-white border-border uppercase"
+                            className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase"
                             {...field}
                           />
                         </FormControl>
@@ -518,7 +518,7 @@ export default function Signup() {
                           </FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="h-9 text-xs bg-white border-border">
+                              <SelectTrigger className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700">
                                 <SelectValue placeholder="Year" />
                               </SelectTrigger>
                             </FormControl>
@@ -543,7 +543,7 @@ export default function Signup() {
                           </FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="h-9 text-xs bg-white border-border">
+                              <SelectTrigger className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700">
                                 <SelectValue placeholder="Sec" />
                               </SelectTrigger>
                             </FormControl>
@@ -570,7 +570,7 @@ export default function Signup() {
                         <FormControl>
                           <Input
                             placeholder="e.g. M.Tech, Ph.D, B.Tech"
-                            className="h-9 text-xs bg-white border-border"
+                            className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700"
                             {...field}
                           />
                         </FormControl>
@@ -595,7 +595,7 @@ export default function Signup() {
                         <FormControl>
                           <Input
                             placeholder="e.g. FAC-CSE-001"
-                            className="h-10 text-xs bg-white border-border uppercase"
+                            className="h-10 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700 uppercase"
                             {...field}
                           />
                         </FormControl>
@@ -614,7 +614,7 @@ export default function Signup() {
                         <FormControl>
                           <Input
                             placeholder="e.g. M.Tech, Ph.D, B.Tech"
-                            className="h-10 text-xs bg-white border-border"
+                            className="h-10 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700"
                             {...field}
                           />
                         </FormControl>

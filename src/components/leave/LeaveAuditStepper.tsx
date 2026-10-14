@@ -33,7 +33,7 @@ export const LeaveAuditStepper: React.FC<Props> = ({ leave }) => {
           <ShieldCheck className="h-3.5 w-3.5 text-siet-primary dark:text-red-400" />
           Approval Path ({totalDays} Day{totalDays > 1 ? "s" : ""})
         </span>
-        <span className="text-[11px] font-mono uppercase font-bold text-siet-primary dark:text-red-400">
+        <span className="text-[11px] uppercase font-bold text-siet-primary dark:text-red-400">
           Deciding Authority: {finalAuthority || "faculty"}
         </span>
       </div>

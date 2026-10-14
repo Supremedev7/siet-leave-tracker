@@ -173,7 +173,7 @@ export default function MyLeaves() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-siet-primary/10 text-siet-primary text-xs font-bold tracking-wide uppercase mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-siet-primary/10 dark:bg-red-500/10 text-siet-primary dark:text-red-400 text-xs font-bold tracking-wide uppercase mb-2">
               <CalendarDays className="h-3.5 w-3.5" />
               History &amp; Approvals
             </div>
@@ -218,7 +218,7 @@ export default function MyLeaves() {
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
                     statusFilter === tab.id
                       ? "bg-white/20 text-white"
                       : "bg-muted dark:bg-zinc-800 text-muted-foreground dark:text-zinc-400"

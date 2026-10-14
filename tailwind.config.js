@@ -14,6 +14,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Montserrat', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        display: ['Montserrat', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
@@ -27,6 +28,44 @@ export default {
           dark:       "hsl(var(--primary-dark))",
           light:      "hsl(var(--primary-light))",
           foreground: "hsl(var(--primary-foreground))",
+        },
+        'siet-primary': {
+          DEFAULT: "hsl(var(--primary))",
+          dark:    "hsl(var(--primary-dark))",
+          light:   "hsl(var(--primary-light))",
+        },
+        'siet-gold': {
+          DEFAULT: "hsl(var(--accent))",
+          dark:    "hsl(var(--accent-dark))",
+          light:   "#FFB24D",
+        },
+        siet: {
+          primary: {
+            DEFAULT: "hsl(var(--primary))",
+            dark:    "hsl(var(--primary-dark))",
+            light:   "hsl(var(--primary-light))",
+          },
+          gold: {
+            DEFAULT: "hsl(var(--accent))",
+            dark:    "hsl(var(--accent-dark))",
+            light:   "#FFB24D",
+          },
+        },
+        zinc: {
+          50:  '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          650: '#43434b',
+          700: '#3f3f46',
+          750: '#323238',
+          800: '#27272a',
+          850: '#1e1e23',
+          900: '#18181b',
+          950: '#09090b',
         },
         accent: {
           DEFAULT:    "hsl(var(--accent))",

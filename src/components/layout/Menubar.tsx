@@ -132,7 +132,7 @@ export const Menubar: React.FC<MenubarProps> = ({ pendingCount, facultyPendingCo
 
                 {/* Clean Integer Notification Badge */}
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="relative z-10 px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-siet-primary dark:bg-red-600 text-white">
+                  <span className="relative z-10 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold bg-siet-primary dark:bg-red-600 text-white shadow-xs">
                     {item.badge}
                   </span>
                 )}

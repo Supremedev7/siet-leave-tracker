@@ -24,7 +24,7 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     case "approved":
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-emerald-300/80 dark:border-emerald-800/60 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-normal border border-emerald-300 dark:border-emerald-700/80 bg-emerald-50/90 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 rounded-full select-none shadow-2xs ${sizeClasses} ${className}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 flex-shrink-0" />
           Approved
@@ -33,7 +33,7 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     case "rejected":
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-rose-300/80 dark:border-rose-800/60 bg-rose-50/70 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-normal border border-rose-300 dark:border-rose-700/80 bg-rose-50/90 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 rounded-full select-none shadow-2xs ${sizeClasses} ${className}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-rose-600 dark:bg-rose-400 flex-shrink-0" />
           Rejected
@@ -42,7 +42,7 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     case "cancelled":
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-zinc-300 dark:border-zinc-700 bg-zinc-100/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-normal border border-zinc-300 dark:border-zinc-700 bg-zinc-100/90 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full select-none shadow-2xs ${sizeClasses} ${className}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0" />
           Cancelled
@@ -51,7 +51,7 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     case "pending_faculty":
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-amber-300/80 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-normal border border-amber-300 dark:border-amber-700/80 bg-amber-50/90 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 rounded-full select-none shadow-2xs ${sizeClasses} ${className}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0 animate-pulse" />
           Pending Advisor
@@ -60,7 +60,7 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     case "pending_hod":
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-blue-300/80 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-normal border border-blue-300 dark:border-blue-700/80 bg-blue-50/90 dark:bg-blue-950/60 text-blue-800 dark:text-blue-200 rounded-full select-none shadow-2xs ${sizeClasses} ${className}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400 flex-shrink-0 animate-pulse" />
           Pending HOD
@@ -69,7 +69,7 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     case "pending_admin":
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-purple-300/80 dark:border-purple-800/60 bg-purple-50/70 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-normal border border-purple-300 dark:border-purple-700/80 bg-purple-50/90 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 rounded-full select-none shadow-2xs ${sizeClasses} ${className}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-purple-500 dark:bg-purple-400 flex-shrink-0 animate-pulse" />
           Pending Principal
@@ -79,9 +79,9 @@ export const StatusTag: React.FC<StatusTagProps> = ({
     default:
       return (
         <span
-          className={`inline-flex items-center font-semibold tracking-wide border border-amber-300/80 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-md font-mono select-none ${sizeClasses} ${className}`}
+          className={`inline-flex items-center font-semibold tracking-normal border border-amber-300 dark:border-amber-700/80 bg-amber-50/90 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 rounded-full select-none shadow-2xs ${sizeClasses} ${className}`}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0" />
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 flex-shrink-0 animate-pulse" />
           Pending Review
         </span>
       );

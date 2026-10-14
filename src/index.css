@@ -65,42 +65,42 @@
 
   .dark {
     /* ─── SIET Brand Palette Dark Mode ─── */
-    --primary:         0 72% 45%;    /* High-contrast rich maroon */
-    --primary-dark:    0 72% 35%;
-    --primary-light:   0 76% 56%;
-    --primary-foreground: 0 0% 98%;
+    --primary:         0 72% 50%;    /* High-contrast luminous crimson maroon */
+    --primary-dark:    0 72% 38%;
+    --primary-light:   0 76% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --accent:          33 93% 54%;   /* Amber Gold */
+    --accent:          33 95% 55%;   /* Luminous Amber Gold */
     --accent-dark:     33 93% 45%;
-    --accent-foreground: 0 0% 98%;
+    --accent-foreground: 0 0% 100%;
 
     /* ─── Surface & Background ─── */
     --background:      240 10% 4%;   /* #09090b / #0a0a0c */
     --foreground:      0 0% 98%;
 
-    --card:            240 6% 9%;    /* #141417 */
+    --card:            240 6% 10%;    /* #18181b */
     --card-foreground: 0 0% 98%;
 
-    --popover:         240 6% 9%;
+    --popover:         240 6% 10%;
     --popover-foreground: 0 0% 98%;
 
     --secondary:       240 5% 15%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary-foreground: 0 0% 92%;
 
     --muted:           240 5% 15%;
     --muted-foreground: 240 5% 65%;
 
     --border:          240 4% 18%;   /* #27272a */
     --input:           240 4% 18%;
-    --ring:            0 72% 48%;
+    --ring:            0 72% 50%;
 
     /* ─── Semantic Colors ─── */
-    --success:         142 70% 45%;
+    --success:         142 70% 48%;
     --success-bg:      142 70% 12%;
-    --warning:         38 90% 50%;
+    --warning:         38 92% 52%;
     --warning-bg:      38 90% 12%;
-    --destructive:     0 75% 55%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive:     0 75% 58%;
+    --destructive-foreground: 0 0% 100%;
     --destructive-bg:  0 75% 12%;
 
     /* ─── Glassmorphism tokens ─── */
@@ -256,7 +256,8 @@
 
 /* ─── Stats card ─── */
 .stats-card {
-  background: white;
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
   box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
@@ -270,8 +271,7 @@
 /* ─── Form input focus glow ─── */
 input:focus, textarea:focus, select:focus {
   outline: none;
-  ring: none;
-  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.18);
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.28);
 }
 
 /* ─── Print styles for leave certificate ─── */
