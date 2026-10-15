@@ -3,27 +3,12 @@ import { motion } from "framer-motion";
 import { SIETLogo } from "@/components/branding/SIETLogo";
 
 export const MinimalTopProgressBar: React.FC = () => {
-  return (
-    <div className="fixed top-0 left-0 right-0 h-[3px] bg-zinc-200/60 dark:bg-zinc-800/80 z-[9999] overflow-hidden">
-      <motion.div
-        className="h-full bg-gradient-to-r from-siet-primary via-siet-gold to-siet-primary"
-        initial={{ x: "-100%" }}
-        animate={{ x: "200%" }}
-        transition={{
-          repeat: Infinity,
-          duration: 1.4,
-          ease: "easeInOut",
-        }}
-        style={{ width: "50%" }}
-      />
-    </div>
-  );
+  return null;
 };
 
 export const SIETLoadingScreen: React.FC = () => {
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#FAFAF9] dark:bg-zinc-950 z-50 p-6 select-none transition-colors">
-      <MinimalTopProgressBar />
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}

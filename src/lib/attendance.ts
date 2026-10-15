@@ -1,4 +1,4 @@
-import { format, isSunday, startOfMonth, endOfMonth, eachDayOfInterval, parseISO } from "date-fns";
+import { format, isSunday, isBefore, startOfMonth, endOfMonth, eachDayOfInterval, parseISO } from "date-fns";
 
 export interface DepartmentWorkingDays {
   id: string;
@@ -31,6 +31,68 @@ export function calculateDefaultWorkingDays(year: number, monthIndex: number): n
   // Exclude Sundays
   const workingDays = allDays.filter((d) => !isSunday(d)).length;
   return Math.max(1, workingDays);
+}
+
+/**
+ * Calculates academic/working leave days between start and end date,
+ * strictly excluding natural holidays (Sundays).
+ * SIET operates on a 6-day academic schedule (Mon–Sat).
+ */
+export function calculateLeaveDays(
+  startDate: Date | string | null | undefined,
+  endDate: Date | string | null | undefined,
+  isHalfDay: boolean = false
+): {
+  totalDays: number;
+  calendarDays: number;
+  sundaysCount: number;
+} {
+  if (!startDate || !endDate) {
+    return { totalDays: 0, calendarDays: 0, sundaysCount: 0 };
+  }
+
+  try {
+    const s =
+      typeof startDate === "string"
+        ? parseISO(startDate)
+        : (startDate as any)?.toDate
+        ? (startDate as any).toDate()
+        : new Date(startDate);
+    const e =
+      typeof endDate === "string"
+        ? parseISO(endDate)
+        : (endDate as any)?.toDate
+        ? (endDate as any).toDate()
+        : new Date(endDate);
+
+    const start = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+    const end = new Date(e.getFullYear(), e.getMonth(), e.getDate());
+
+    if (isBefore(end, start)) {
+      return { totalDays: 0, calendarDays: 0, sundaysCount: 0 };
+    }
+
+    const allDays = eachDayOfInterval({ start, end });
+    const calendarDays = allDays.length;
+    const workingDaysList = allDays.filter((d) => !isSunday(d));
+    const sundaysCount = calendarDays - workingDaysList.length;
+
+    if (isHalfDay) {
+      return {
+        totalDays: workingDaysList.length > 0 ? 0.5 : 0,
+        calendarDays: 1,
+        sundaysCount: isSunday(start) ? 1 : 0,
+      };
+    }
+
+    return {
+      totalDays: workingDaysList.length,
+      calendarDays,
+      sundaysCount,
+    };
+  } catch {
+    return { totalDays: 0, calendarDays: 0, sundaysCount: 0 };
+  }
 }
 
 /**

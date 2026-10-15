@@ -28,8 +28,10 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Clock, Send, Briefcase } from "lucide-react";
-import { differenceInCalendarDays, parseISO, isBefore, startOfToday } from "date-fns";
+import { Calendar, Clock, Send, Briefcase, AlertCircle } from "lucide-react";
+import { parseISO, isBefore, startOfToday } from "date-fns";
+import { DatePicker } from "@/components/ui/date-picker";
+import { calculateLeaveDays } from "@/lib/attendance";
 
 const facultyLeaveSchema = z
   .object({
@@ -74,22 +76,23 @@ export default function FacultyApplyLeave() {
   const watchEnd = form.watch("endDate");
   const watchType = form.watch("type");
 
-  const totalDays = useMemo(() => {
-    if (!watchStart || !watchEnd) return 0;
-    const start = parseISO(watchStart);
-    const end = parseISO(watchEnd);
-    if (isBefore(end, start)) return 0;
-    if (watchType === "Half-Day") return 0.5;
-    return differenceInCalendarDays(end, start) + 1;
+  const durationInfo = useMemo(() => {
+    return calculateLeaveDays(watchStart, watchEnd, watchType === "Half-Day");
   }, [watchStart, watchEnd, watchType]);
+
+  const totalDays = durationInfo.totalDays;
+  const sundaysCount = durationInfo.sundaysCount;
 
   const onSubmit = async (values: FacultyLeaveFormValues) => {
     if (!userData) return;
+    if (totalDays <= 0) {
+      toast.error("Invalid leave duration: selected dates fall entirely on Sundays (natural holidays). No leave deduction required.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const start = parseISO(values.startDate);
       const end = parseISO(values.endDate);
-      const days = values.type === "Half-Day" ? 0.5 : differenceInCalendarDays(end, start) + 1;
 
       await addDoc(collection(db, "facultyLeaveRequests"), {
         facultyUid: userData.uid,
@@ -100,7 +103,7 @@ export default function FacultyApplyLeave() {
         type: values.type,
         startDate: Timestamp.fromDate(start),
         endDate: Timestamp.fromDate(end),
-        totalDays: days,
+        totalDays: totalDays,
         reason: values.reason,
         emergencyPhone: values.emergencyPhone,
         attachmentUrl: values.attachmentUrl || null,
@@ -186,9 +189,15 @@ export default function FacultyApplyLeave() {
                     name="startDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-bold uppercase text-muted-foreground">Start Date</FormLabel>
+                        <FormLabel className="text-xs font-bold uppercase text-muted-foreground">Start Date (DD/MM/YYYY)</FormLabel>
                         <FormControl>
-                          <Input type="date" min={todayStr} className="h-10 text-xs bg-muted/20 dark:bg-zinc-800/60 border-border" {...field} />
+                          <DatePicker
+                            id="facultyStartDate"
+                            min={todayStr}
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="DD/MM/YYYY"
+                          />
                         </FormControl>
                         <FormMessage className="text-[11px]" />
                       </FormItem>
@@ -199,9 +208,15 @@ export default function FacultyApplyLeave() {
                     name="endDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-bold uppercase text-muted-foreground">End Date</FormLabel>
+                        <FormLabel className="text-xs font-bold uppercase text-muted-foreground">End Date (DD/MM/YYYY)</FormLabel>
                         <FormControl>
-                          <Input type="date" min={watchStart || todayStr} className="h-10 text-xs bg-muted/20 dark:bg-zinc-800/60 border-border" {...field} />
+                          <DatePicker
+                            id="facultyEndDate"
+                            min={watchStart || todayStr}
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="DD/MM/YYYY"
+                          />
                         </FormControl>
                         <FormMessage className="text-[11px]" />
                       </FormItem>
@@ -210,14 +225,30 @@ export default function FacultyApplyLeave() {
                 </div>
 
                 {/* Total Days Display */}
-                {totalDays > 0 && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/30">
-                    <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                      Total Days: {totalDays} {totalDays === 1 ? "day" : "days"}
+                {totalDays > 0 ? (
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/30 text-xs">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <div>
+                        <span className="font-bold text-emerald-700 dark:text-emerald-300">
+                          Total Days: {totalDays} {totalDays === 1 ? "day" : "days"}
+                        </span>
+                        {sundaysCount > 0 && (
+                          <span className="text-[11px] text-amber-700 dark:text-amber-400 font-medium ml-2">
+                            ({sundaysCount} {sundaysCount === 1 ? "Sunday" : "Sundays"} excluded as natural holiday)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : watchStart && watchEnd ? (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 text-xs text-amber-800 dark:text-amber-300">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>
+                      Selected dates fall entirely on Sundays (natural holidays). No leave days will be deducted.
                     </span>
                   </div>
-                )}
+                ) : null}
 
                 {/* Reason */}
                 <FormField

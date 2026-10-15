@@ -35,9 +35,12 @@ import {
   Paperclip, 
   Send, 
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
-import { differenceInCalendarDays, parseISO, isBefore, startOfToday } from "date-fns";
+import { parseISO, isBefore, startOfToday } from "date-fns";
+import { DatePicker } from "@/components/ui/date-picker";
+import { calculateLeaveDays } from "@/lib/attendance";
 
 const leaveSchema = z.object({
   type: z.enum(["Medical", "Personal", "Half-Day", "Emergency"]),
@@ -93,23 +96,22 @@ export default function ApplyLeave() {
   const watchEndDate = form.watch("endDate");
   const watchType = form.watch("type");
 
-  // Calculate duration
-  const totalDays = useMemo(() => {
-    if (!watchStartDate || !watchEndDate) return 0;
-    try {
-      const start = parseISO(watchStartDate);
-      const end = parseISO(watchEndDate);
-      if (isBefore(end, start)) return 0;
-      if (watchType === "Half-Day") return 0.5;
-      return differenceInCalendarDays(end, start) + 1;
-    } catch {
-      return 0;
-    }
+  // Calculate duration (excluding Sundays as natural holidays)
+  const durationInfo = useMemo(() => {
+    return calculateLeaveDays(watchStartDate, watchEndDate, watchType === "Half-Day");
   }, [watchStartDate, watchEndDate, watchType]);
+
+  const totalDays = durationInfo.totalDays;
+  const sundaysCount = durationInfo.sundaysCount;
 
   const onSubmit = async (values: LeaveFormValues) => {
     if (!userData) {
       toast.error("You must be logged in to apply for leave");
+      return;
+    }
+
+    if (totalDays <= 0) {
+      toast.error("Invalid leave duration: selected dates fall entirely on Sundays (natural holidays). No leave deduction required.");
       return;
     }
 
@@ -125,7 +127,7 @@ export default function ApplyLeave() {
         reason: values.reason,
         emergencyPhone: values.emergencyPhone,
         attachmentUrl: values.attachmentUrl || null,
-        totalDays: totalDays || 1,
+        totalDays: totalDays,
         startDate: Timestamp.fromDate(startObj),
         endDate: Timestamp.fromDate(endObj),
         studentUid: userData.uid,
@@ -240,14 +242,15 @@ export default function ApplyLeave() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                              From Date
+                              From Date (DD/MM/YYYY)
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                type="date"
+                              <DatePicker
+                                id="startDate"
                                 min={todayStr}
-                                className="h-11 bg-muted/20 border-border hover:border-siet-primary/50"
-                                {...field}
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="DD/MM/YYYY"
                               />
                             </FormControl>
                             <FormMessage />
@@ -261,14 +264,15 @@ export default function ApplyLeave() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                              To Date
+                              To Date (DD/MM/YYYY)
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                type="date"
+                              <DatePicker
+                                id="endDate"
                                 min={watchStartDate || todayStr}
-                                className="h-11 bg-muted/20 border-border hover:border-siet-primary/50"
-                                {...field}
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="DD/MM/YYYY"
                               />
                             </FormControl>
                             <FormMessage />
@@ -278,17 +282,31 @@ export default function ApplyLeave() {
                     </div>
 
                     {/* Duration Preview Box */}
-                    {totalDays > 0 && (
+                    {totalDays > 0 ? (
                       <div className="p-3.5 rounded-xl bg-siet-primary/5 dark:bg-red-500/10 border border-siet-primary/20 dark:border-red-500/30 flex items-center justify-between text-xs animate-fade-up">
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-siet-primary dark:text-red-400" />
-                          <span className="font-medium text-foreground">Calculated Duration:</span>
+                          <Clock className="h-4 w-4 text-siet-primary dark:text-red-400 shrink-0" />
+                          <div>
+                            <span className="font-semibold text-foreground">Calculated Duration: </span>
+                            {sundaysCount > 0 && (
+                              <span className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+                                ({sundaysCount} {sundaysCount === 1 ? "Sunday" : "Sundays"} excluded as natural holiday)
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <span className="font-bold px-2.5 py-0.5 rounded-full bg-siet-primary text-white">
+                        <span className="font-bold px-2.5 py-0.5 rounded-full bg-siet-primary text-white shrink-0">
                           {totalDays} {totalDays === 1 ? "Day" : "Days"}
                         </span>
                       </div>
-                    )}
+                    ) : watchStartDate && watchEndDate ? (
+                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300 animate-fade-up">
+                        <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                        <span>
+                          Selected dates fall entirely on Sundays (natural holidays). No academic leave days will be deducted.
+                        </span>
+                      </div>
+                    ) : null}
 
                     {/* Reason */}
                     <FormField

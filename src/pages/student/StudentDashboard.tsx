@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { db } from "@/lib/firebase";
 import { collection, query, where, orderBy, onSnapshot, Timestamp } from "firebase/firestore";
 import { format } from "date-fns";
+import { calculateLeaveDays } from "@/lib/attendance";
 import { Link } from "react-router-dom";
 import {
   Clock, CheckCircle2, XCircle, FilePlus2,
@@ -24,7 +25,7 @@ interface LeaveRequest {
   createdAt: Timestamp;
 }
 
-function safeDateFormat(ts: Timestamp | undefined, fmt = "MMM dd, yyyy"): string {
+function safeDateFormat(ts: Timestamp | undefined, fmt = "dd/MM/yyyy"): string {
   try {
     if (!ts) return "—";
     return format(ts.toDate(), fmt);
@@ -33,13 +34,8 @@ function safeDateFormat(ts: Timestamp | undefined, fmt = "MMM dd, yyyy"): string
   }
 }
 
-function getDaysBetween(start: Timestamp, end: Timestamp): number {
-  try {
-    const diff = end.toDate().getTime() - start.toDate().getTime();
-    return Math.max(1, Math.round(diff / (1000 * 60 * 60 * 24)) + 1);
-  } catch {
-    return 1;
-  }
+function getDaysBetween(start: any, end: any): number {
+  return calculateLeaveDays(start, end).totalDays || 1;
 }
 
 export default function StudentDashboard() {

@@ -13,6 +13,19 @@ import { Check, X, Forward, Clock, Phone } from "lucide-react";
 import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
 import { sendLeaveNotification } from "@/lib/notifications";
 import { sendLeaveSmsNotification } from "@/lib/sms";
+import { format } from "date-fns";
+
+const formatDate = (val: any): string => {
+  if (!val) return "";
+  try {
+    if (typeof val.toDate === "function") return format(val.toDate(), "dd/MM/yyyy");
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return format(d, "dd/MM/yyyy");
+  } catch {
+    // fallback
+  }
+  return String(val);
+};
 
 export default function FacultyApprovals() {
   const { userData } = useAuth();
@@ -102,7 +115,7 @@ export default function FacultyApprovals() {
           : "Leave Rejected by Class Advisor";
       const notifBody =
         action === "approved"
-          ? `Your ${selectedLeave.type} leave (${selectedLeave.startDate} to ${selectedLeave.endDate}) has been approved.`
+          ? `Your ${selectedLeave.type} leave (${formatDate(selectedLeave.startDate)} to ${formatDate(selectedLeave.endDate)}) has been approved.`
           : action === "forwarded"
           ? `Your ${selectedLeave.type} leave request has been reviewed and forwarded to the HOD.`
           : `Your ${selectedLeave.type} leave request was rejected by your Class Advisor.`;
@@ -117,8 +130,8 @@ export default function FacultyApprovals() {
           actorName: userData.name,
           actorRole: "faculty",
           leaveType: selectedLeave.type,
-          startDate: selectedLeave.startDate,
-          endDate: selectedLeave.endDate,
+          startDate: formatDate(selectedLeave.startDate),
+          endDate: formatDate(selectedLeave.endDate),
           remarks: remarks.trim(),
         },
       });
@@ -130,8 +143,8 @@ export default function FacultyApprovals() {
           recipientUid: selectedLeave.studentUid,
           recipientName: selectedLeave.studentName,
           leaveType: selectedLeave.type,
-          startDate: String(selectedLeave.startDate || ""),
-          endDate: String(selectedLeave.endDate || ""),
+          startDate: formatDate(selectedLeave.startDate),
+          endDate: formatDate(selectedLeave.endDate),
           status: action,
           approverName: userData.name,
           approverRole: "Class Advisor",

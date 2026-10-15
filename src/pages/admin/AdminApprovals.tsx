@@ -12,6 +12,19 @@ import { Check, X, ShieldAlert, Phone, Paperclip } from "lucide-react";
 import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
 import { sendLeaveNotification } from "@/lib/notifications";
 import { sendLeaveSmsNotification } from "@/lib/sms";
+import { format } from "date-fns";
+
+const formatDate = (val: any): string => {
+  if (!val) return "";
+  try {
+    if (typeof val.toDate === "function") return format(val.toDate(), "dd/MM/yyyy");
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return format(d, "dd/MM/yyyy");
+  } catch {
+    // fallback
+  }
+  return String(val);
+};
 
 export default function AdminApprovals() {
   const { userData } = useAuth();
@@ -90,8 +103,8 @@ export default function AdminApprovals() {
         recipientUid: selectedLeave.studentUid,
         recipientName: selectedLeave.studentName,
         leaveType: selectedLeave.type,
-        startDate: String(selectedLeave.startDate || ""),
-        endDate: String(selectedLeave.endDate || ""),
+        startDate: formatDate(selectedLeave.startDate),
+        endDate: formatDate(selectedLeave.endDate),
         status: action,
         approverName: userData.name,
         approverRole: "Principal / Executive Admin",
@@ -170,6 +183,7 @@ export default function AdminApprovals() {
               <LeaveAuditStepper leave={selectedLeave} />
 
               <div className="text-xs space-y-2 bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-lg border border-zinc-200/50 dark:border-zinc-800">
+                <p><span className="font-bold">Leave Duration:</span> {formatDate(selectedLeave.startDate)} to {formatDate(selectedLeave.endDate)} ({selectedLeave.totalDays} days)</p>
                 <p><span className="font-bold">Stated Reason:</span> {selectedLeave.reason}</p>
                 {selectedLeave.emergencyPhone && (
                   <p className="flex items-center gap-1"><Phone className="h-3 w-3" /> {selectedLeave.emergencyPhone}</p>

@@ -55,7 +55,7 @@ interface LeaveRecord {
   section: string;
 }
 
-const safeFormatDate = (dateVal: any, pattern = "MMM dd, yyyy"): string => {
+const safeFormatDate = (dateVal: any, pattern = "dd/MM/yyyy"): string => {
   if (!dateVal) return "—";
   try {
     if (typeof dateVal.toDate === "function") {
@@ -306,7 +306,7 @@ export default function MyLeaves() {
                       </div>
                       <p className="text-xs text-muted-foreground dark:text-zinc-400 flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5" />
-                        Applied on {safeFormatDate(leave.createdAt, "dd MMM yyyy")}
+                        Applied on {safeFormatDate(leave.createdAt, "dd/MM/yyyy")}
                       </p>
                     </div>
                     <StatusTag status={leave.status} />

@@ -8,7 +8,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { StatusTag } from "@/components/ui/StatusTag";
-import { computeMonthlyAttendance, calculateDefaultWorkingDays } from "@/lib/attendance";
+import { computeMonthlyAttendance, calculateDefaultWorkingDays, calculateLeaveDays } from "@/lib/attendance";
 
 export interface StudentProfileData {
   uid?: string;
@@ -29,7 +29,7 @@ interface StudentLeaveDetailModalProps {
   currentMonthWorkingDays?: number;
 }
 
-const safeFormatDate = (dateVal: any, pattern = "dd MMM yyyy"): string => {
+const safeFormatDate = (dateVal: any, pattern = "dd/MM/yyyy"): string => {
   if (!dateVal) return "—";
   try {
     if (typeof dateVal.toDate === "function") {
@@ -46,14 +46,7 @@ const safeFormatDate = (dateVal: any, pattern = "dd MMM yyyy"): string => {
 };
 
 const getDaysBetween = (startVal: any, endVal: any): number => {
-  try {
-    const s = startVal?.toDate ? startVal.toDate() : new Date(startVal);
-    const e = endVal?.toDate ? endVal.toDate() : new Date(endVal);
-    const diff = e.getTime() - s.getTime();
-    return Math.max(1, Math.round(diff / (1000 * 60 * 60 * 24)) + 1);
-  } catch {
-    return 1;
-  }
+  return calculateLeaveDays(startVal, endVal).totalDays || 1;
 };
 
 export const StudentLeaveDetailModal: React.FC<StudentLeaveDetailModalProps> = ({

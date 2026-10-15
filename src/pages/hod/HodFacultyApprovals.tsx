@@ -119,7 +119,7 @@ export default function HodFacultyApprovals() {
   const formatDate = (ts: any) => {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return format(d, "dd MMM yyyy");
+    return format(d, "dd/MM/yyyy");
   };
 
   return (

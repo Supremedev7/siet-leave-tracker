@@ -92,7 +92,7 @@ export default function FacultyMyLeaves() {
   const formatDate = (ts: any) => {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return format(d, "dd MMM yyyy");
+    return format(d, "dd/MM/yyyy");
   };
 
   const pendingCount = leaves.filter((l) => l.status === "pending_hod").length;

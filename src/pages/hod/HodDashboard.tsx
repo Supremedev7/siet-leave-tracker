@@ -56,6 +56,7 @@ import {
 import {
   calculateDefaultWorkingDays,
   computeMonthlyAttendance,
+  calculateLeaveDays,
 } from "@/lib/attendance";
 
 interface LeaveData {
@@ -90,15 +91,7 @@ const safeToDate = (dateVal: any): Date | null => {
 };
 
 const getDaysBetween = (startVal: any, endVal: any): number => {
-  try {
-    const s = safeToDate(startVal);
-    const e = safeToDate(endVal);
-    if (!s || !e) return 1;
-    const diff = e.getTime() - s.getTime();
-    return Math.max(1, Math.round(diff / (1000 * 60 * 60 * 24)) + 1);
-  } catch {
-    return 1;
-  }
+  return calculateLeaveDays(startVal, endVal).totalDays || 1;
 };
 
 // Official SIET harmonious chart colors

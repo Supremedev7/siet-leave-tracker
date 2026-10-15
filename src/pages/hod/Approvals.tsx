@@ -44,7 +44,7 @@ import { LeaveRequest, ApprovalChainEntry } from "@/types/leave";
 import { canHodApproveDirectly } from "@/lib/escalation";
 import LeaveAuditStepper from "@/components/leave/LeaveAuditStepper";
 
-const safeFormatDate = (dateVal: any, pattern = "dd MMM yyyy"): string => {
+const safeFormatDate = (dateVal: any, pattern = "dd/MM/yyyy"): string => {
   if (!dateVal) return "—";
   try {
     if (typeof dateVal.toDate === "function") {

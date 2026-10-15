@@ -9,6 +9,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { DEPARTMENTS } from "@/lib/constants/academic";
+import { format } from "date-fns";
+
+const formatDate = (val: any): string => {
+  if (!val) return "—";
+  try {
+    if (typeof val.toDate === "function") return format(val.toDate(), "dd/MM/yyyy");
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return format(d, "dd/MM/yyyy");
+  } catch {
+    // fallback
+  }
+  return "—";
+};
 
 export default function AdminAllRequests() {
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
@@ -29,9 +42,9 @@ export default function AdminAllRequests() {
   const filteredLeaves = selectedDept === "ALL" ? leaves : leaves.filter((l) => l.department === selectedDept);
 
   const exportCSV = () => {
-    const headers = "Student,RollNumber,Dept,Year,Section,Type,TotalDays,Status,FinalAuthority\n";
+    const headers = "Student,RollNumber,Dept,Year,Section,Type,TotalDays,StartDate,EndDate,Status,FinalAuthority\n";
     const rows = filteredLeaves
-      .map((l) => `"${l.studentName}","${l.rollNumber}","${l.department}","${l.year}","${l.section}","${l.type}","${l.totalDays}","${l.status}","${l.finalAuthority}"`)
+      .map((l) => `"${l.studentName}","${l.rollNumber}","${l.department}","${l.year}","${l.section}","${l.type}","${l.totalDays}","${formatDate(l.startDate)}","${formatDate(l.endDate)}","${l.status}","${l.finalAuthority}"`)
       .join("\n");
     const blob = new Blob([headers + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -73,6 +86,7 @@ export default function AdminAllRequests() {
                 <TableHead>Roll No</TableHead>
                 <TableHead>Dept</TableHead>
                 <TableHead>Class</TableHead>
+                <TableHead>Dates (DD/MM/YYYY)</TableHead>
                 <TableHead>Days</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Authority</TableHead>
@@ -81,7 +95,7 @@ export default function AdminAllRequests() {
             <TableBody>
               {filteredLeaves.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     No leave requests found for this filter.
                   </TableCell>
                 </TableRow>
@@ -92,6 +106,9 @@ export default function AdminAllRequests() {
                     <TableCell className="font-mono text-xs">{l.rollNumber}</TableCell>
                     <TableCell>{l.department}</TableCell>
                     <TableCell>Y{l.year}-{l.section}</TableCell>
+                    <TableCell className="text-xs whitespace-nowrap text-zinc-600 dark:text-zinc-300">
+                      {formatDate(l.startDate)} → {formatDate(l.endDate)}
+                    </TableCell>
                     <TableCell>{l.totalDays}</TableCell>
                     <TableCell>
                       <span className="px-2 py-0.5 rounded text-xs font-bold uppercase bg-zinc-100 dark:bg-zinc-800">

@@ -1,7 +1,6 @@
 import React from "react";
 import TopMasthead from "./TopMasthead";
 import Menubar from "./Menubar";
-import { MinimalTopProgressBar } from "@/components/ui/MinimalLoader";
 import { motion } from "framer-motion";
 
 interface PortalLayoutProps {
@@ -17,9 +16,6 @@ export const PortalLayout: React.FC<PortalLayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen bg-[#FAFAF9] dark:bg-zinc-950 flex flex-col text-zinc-900 dark:text-zinc-100 font-sans selection:bg-siet-primary/10 selection:text-siet-primary transition-colors">
-      {/* Sleek top indeterminate progress line during async actions */}
-      <MinimalTopProgressBar />
-
       {/* Tier 1: Top Institutional Masthead */}
       <TopMasthead />
 
