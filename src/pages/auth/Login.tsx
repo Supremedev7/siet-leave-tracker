@@ -254,7 +254,7 @@ export default function Login() {
               }`}
             >
               <Briefcase className="h-4 w-4" aria-hidden="true" />
-              <span>Faculty &amp; Staff Desk</span>
+              <span>Faculty, Staff &amp; Admin</span>
             </button>
           </div>
 
@@ -267,10 +267,10 @@ export default function Login() {
                   htmlFor="login-identifier"
                   className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300"
                 >
-                  {activePortal === "student" ? "College email address" : "Staff employee ID or email"}
+                  {activePortal === "student" ? "College email address" : "Staff ID, Faculty ID, or Admin Email"}
                 </label>
                 <span className="text-[11px] font-normal text-zinc-400">
-                  {activePortal === "student" ? "JNTUK roll format" : "Assigned staff code"}
+                  {activePortal === "student" ? "JNTUK roll format" : "Assigned ID or Email"}
                 </span>
               </div>
               <div className="relative">
@@ -426,7 +426,7 @@ export default function Login() {
               </span>
             ) : (
               <span>
-                Faculty and HODs sign in with their assigned <strong className="text-zinc-800 dark:text-zinc-200">Employee ID</strong> (e.g. F26AIML0S001) or registered personal/official email.
+                Faculty, HODs, and Administrators sign in with their assigned <strong className="text-zinc-800 dark:text-zinc-200">Employee ID</strong> or registered email (personal or official).
               </span>
             )}
           </div>

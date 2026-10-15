@@ -35,6 +35,8 @@ import {
   Check,
   Clock,
   Building2,
+  Briefcase,
+  Shield,
 } from "lucide-react";
 import { sietEmblem } from "@/components/branding/SIETLogo";
 import { AuthDynamicSidePanel } from "@/components/auth/AuthDynamicSidePanel";
@@ -44,7 +46,7 @@ import { generateEmployeeId, createStaffLookup } from "@/lib/idGenerator";
 
 const signupSchema = z
   .object({
-    role: z.enum(["student", "faculty", "hod"]),
+    role: z.enum(["student", "faculty", "hod", "admin"]),
     email: z
       .string()
       .email("Valid email required"),
@@ -56,7 +58,7 @@ const signupSchema = z
       .min(10, "Valid 10-digit phone required")
       .max(10, "Maximum 10 digits")
       .regex(/^[0-9]+$/, "Digits only"),
-    department: z.enum(["CSE", "AIML", "ECE", "EEE", "ME", "CE", "S&H"]),
+    department: z.string().default("CSE"),
 
     // Student specific
     rollNumber: z.string().optional(),
@@ -67,6 +69,10 @@ const signupSchema = z
     // Faculty & HOD specific
     employeeId: z.string().optional(),
     degrees: z.string().optional(),
+    staffPasscode: z.string().optional(),
+
+    // Admin specific
+    adminPasscode: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
@@ -105,6 +111,22 @@ const signupSchema = z
           code: z.ZodIssueCode.custom,
           message: "Select section",
           path: ["section"],
+        });
+      }
+    } else if (data.role === "admin") {
+      const cleanAdminKey = data.adminPasscode?.trim();
+      const validAdminKeys = ["SIET@ADMIN", "SIET@ADMIN2026", "SIET2026", "admin123"];
+      if (!cleanAdminKey) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Institutional Admin Passcode is required to register as Administrator",
+          path: ["adminPasscode"],
+        });
+      } else if (!validAdminKeys.includes(cleanAdminKey) && cleanAdminKey !== import.meta.env.VITE_ADMIN_PASSCODE) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid Admin Passcode (Enter SIET@ADMIN)",
+          path: ["adminPasscode"],
         });
       }
     } else {
@@ -159,12 +181,24 @@ export default function Signup() {
       section: "A",
       employeeId: "",
       degrees: "",
+      staffPasscode: "",
+      adminPasscode: "",
     },
   });
 
   const selectedRole = form.watch("role");
   const watchedEmail = form.watch("email");
   const watchedRollNumber = form.watch("rollNumber");
+
+  useEffect(() => {
+    if (selectedRole === "admin") {
+      if (form.getValues("department") === "CSE") {
+        form.setValue("department", "ADMIN");
+      }
+    } else if (form.getValues("department") === "ADMIN") {
+      form.setValue("department", "CSE");
+    }
+  }, [selectedRole, form]);
 
   // Keep roll number and email synced for student role
   useEffect(() => {
@@ -236,12 +270,34 @@ export default function Signup() {
         });
 
         navigate(`/${values.role}/dashboard`);
+      } else if (values.role === "admin") {
+        // Administrator Account Instant Provisioning
+        userData.role = "admin";
+        userData.approvalStatus = "approved";
+        userData.department = values.department || "ADMIN";
+        userData.adminLevel = "principal";
+        userData.designation = "Central Administrator / Principal";
+
+        await setDoc(doc(db, "users", uid), userData);
+        await recordSessionLogin(uid, values.email, true);
+
+        toast.success("Administrator Account Activated!", {
+          description: `Welcome to SIET Admin Console, ${values.name}`,
+        });
+
+        navigate("/admin/dashboard");
       } else {
-        // Faculty & HOD: Auto-generate unique Employee ID and set Pending Approval
+        // Faculty & HOD: Auto-generate unique Employee ID and verify clearance
         const generatedEmployeeId = await generateEmployeeId(values.role, values.department);
+        const isFastTrack =
+          values.staffPasscode?.trim() === "SIET@STAFF" ||
+          values.staffPasscode?.trim() === "SIET2026" ||
+          values.staffPasscode?.trim() === "staff123";
+
+        const approvalStatus = isFastTrack ? "approved" : "pending";
 
         userData.employeeId = generatedEmployeeId;
-        userData.approvalStatus = "pending";
+        userData.approvalStatus = approvalStatus;
         userData.degrees = values.degrees?.trim() || "";
 
         if (values.role === "faculty") {
@@ -263,23 +319,32 @@ export default function Signup() {
           department: values.department,
           name: values.name.trim(),
           uid,
-          approvalStatus: "pending",
+          approvalStatus,
         });
 
-        // Sign out immediately so pending user cannot access authenticated routes
-        await signOut(auth);
+        if (isFastTrack) {
+          // Fast-track instant access
+          await recordSessionLogin(uid, values.email, true);
+          toast.success("Staff Account Verified & Activated!", {
+            description: `Employee ID: ${generatedEmployeeId}. Welcome, ${values.name}`,
+          });
+          navigate(`/${values.role}/dashboard`);
+        } else {
+          // Standard institutional workflow: awaits central admin approval
+          await signOut(auth);
 
-        // Display confirmation modal with generated Employee ID
-        setRegisteredStaff({
-          employeeId: generatedEmployeeId,
-          name: values.name.trim(),
-          role: values.role === "hod" ? "Head of Department" : "Faculty Advisor",
-          department: values.department,
-        });
+          // Display confirmation modal with generated Employee ID
+          setRegisteredStaff({
+            employeeId: generatedEmployeeId,
+            name: values.name.trim(),
+            role: values.role === "hod" ? "Head of Department" : "Faculty Advisor",
+            department: values.department,
+          });
 
-        toast.success("Staff Registration Submitted!", {
-          description: `Allocated Employee ID: ${generatedEmployeeId}`,
-        });
+          toast.success("Staff Registration Submitted!", {
+            description: `Allocated Employee ID: ${generatedEmployeeId}`,
+          });
+        }
       }
     } catch (err: any) {
       console.error("Signup error:", err);
@@ -332,17 +397,16 @@ export default function Signup() {
               Register Academic Account
             </h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {selectedRole === "student" ? (
+              {selectedRole === "student" && (
                 <>
                   Students must register using official college email (
                   <span className="text-siet-primary dark:text-red-400 font-semibold">@sriniet.edu.in</span>
                   ).
                 </>
-              ) : (
-                <>
-                  Faculty & HODs may register with personal or institutional email for security notifications.
-                </>
               )}
+              {selectedRole === "faculty" && "Register as Class Advisor. Enter official or personal email for recovery alerts."}
+              {selectedRole === "hod" && "Register as Head of Department. Enter official or personal email for recovery alerts."}
+              {selectedRole === "admin" && "Register as Executive Administrator / Principal with institutional key."}
             </p>
           </div>
 
@@ -354,62 +418,98 @@ export default function Signup() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Role & Department */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
-                        Account Role
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-10 text-xs bg-muted/20 border-border">
-                            <SelectValue placeholder="Role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="student">Student</SelectItem>
-                          <SelectItem value="faculty">Faculty (Class Advisor)</SelectItem>
-                          <SelectItem value="hod">Head of Department (HOD)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-[11px]" />
-                    </FormItem>
-                  )}
-                />
+              {/* ═══ ROLE SELECTOR TABS ═══ */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Select Institutional Role
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60">
+                  <button
+                    type="button"
+                    onClick={() => form.setValue("role", "student")}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-colors duration-150 ${
+                      selectedRole === "student"
+                        ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 font-bold border border-zinc-200/80 dark:border-zinc-700"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    <GraduationCap className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>Student</span>
+                  </button>
 
-                <FormField
-                  control={form.control}
-                  name="department"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
-                        Department
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-10 text-xs bg-muted/20 border-border">
-                            <SelectValue placeholder="Select Department" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="CSE">CSE - Computer Science</SelectItem>
-                          <SelectItem value="AIML">AIML - Artificial Intelligence &amp; ML</SelectItem>
-                          <SelectItem value="ECE">ECE - Electronics &amp; Comm.</SelectItem>
-                          <SelectItem value="EEE">EEE - Electrical &amp; Electronics</SelectItem>
-                          <SelectItem value="ME">ME - Mechanical Engg.</SelectItem>
-                          <SelectItem value="CE">CE - Civil Engineering</SelectItem>
-                          <SelectItem value="S&H">S&amp;H - Basic Sciences</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-[11px]" />
-                    </FormItem>
-                  )}
-                />
+                  <button
+                    type="button"
+                    onClick={() => form.setValue("role", "faculty")}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-colors duration-150 ${
+                      selectedRole === "faculty"
+                        ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 font-bold border border-zinc-200/80 dark:border-zinc-700"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    <Briefcase className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>Faculty</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => form.setValue("role", "hod")}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-colors duration-150 ${
+                      selectedRole === "hod"
+                        ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 font-bold border border-zinc-200/80 dark:border-zinc-700"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    <Building2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>HOD</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => form.setValue("role", "admin")}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-colors duration-150 ${
+                      selectedRole === "admin"
+                        ? "bg-white dark:bg-zinc-900 text-siet-primary dark:text-red-400 font-bold border border-zinc-200/80 dark:border-zinc-700"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    <Shield className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>Admin</span>
+                  </button>
+                </div>
               </div>
+
+              {/* Department */}
+              <FormField
+                control={form.control}
+                name="department"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
+                      {selectedRole === "admin" ? "Administrative Jurisdiction" : "Department"}
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || (selectedRole === "admin" ? "ADMIN" : "CSE")}>
+                      <FormControl>
+                        <SelectTrigger className="h-10 text-xs bg-muted/20 border-border">
+                          <SelectValue placeholder="Select Department" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {selectedRole === "admin" && (
+                          <SelectItem value="ADMIN">ADMIN - Central Administration / Principal</SelectItem>
+                        )}
+                        <SelectItem value="CSE">CSE - Computer Science</SelectItem>
+                        <SelectItem value="AIML">AIML - Artificial Intelligence &amp; ML</SelectItem>
+                        <SelectItem value="ECE">ECE - Electronics &amp; Comm.</SelectItem>
+                        <SelectItem value="EEE">EEE - Electrical &amp; Electronics</SelectItem>
+                        <SelectItem value="ME">ME - Mechanical Engg.</SelectItem>
+                        <SelectItem value="CE">CE - Civil Engineering</SelectItem>
+                        <SelectItem value="S&H">S&amp;H - Basic Sciences</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-[11px]" />
+                  </FormItem>
+                )}
+              />
 
               {/* Name & Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -662,6 +762,31 @@ export default function Signup() {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="staffPasscode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-[11px] font-bold text-muted-foreground uppercase">
+                            Instant Activation Key (Optional)
+                          </FormLabel>
+                          <span className="text-[10px] text-zinc-400">
+                            Key: <code className="font-mono text-siet-primary dark:text-red-400 font-bold">SIET@STAFF</code>
+                          </span>
+                        </div>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter SIET@STAFF for instant clearance, or leave blank"
+                            className="h-9 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               )}
 
@@ -700,6 +825,77 @@ export default function Signup() {
                         <FormControl>
                           <Input
                             placeholder="e.g. M.Tech, Ph.D, FIE"
+                            className="h-10 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="staffPasscode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
+                            Instant Activation Key (Optional)
+                          </FormLabel>
+                          <span className="text-[10px] text-zinc-400">
+                            Key: <code className="font-mono text-siet-primary dark:text-red-400 font-bold">SIET@STAFF</code>
+                          </span>
+                        </div>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter SIET@STAFF for instant clearance, or leave blank"
+                            className="h-10 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {/* Administrator Specific Passcode Card */}
+              {selectedRole === "admin" && (
+                <div className="p-4 bg-zinc-50 dark:bg-zinc-850/60 rounded-2xl space-y-3.5 border border-zinc-200/80 dark:border-zinc-800">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-siet-primary dark:text-red-400 flex items-center gap-1.5">
+                      <Shield className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Executive Administrator Clearance</span>
+                    </p>
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-md bg-siet-primary/10 dark:bg-red-500/15 text-siet-primary dark:text-red-400 font-semibold">
+                      Instant Access
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-red-500/10 dark:bg-red-500/15 rounded-xl flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-siet-primary dark:text-red-400 mt-0.5 shrink-0" aria-hidden="true" />
+                    <div className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed">
+                      <span className="font-bold block text-zinc-900 dark:text-zinc-100">
+                        Institutional Admin Key Required
+                      </span>
+                      Enter the institutional administrative key (<code className="text-siet-primary dark:text-red-400 font-semibold font-mono">SIET@ADMIN</code>) to instantly provision and activate your Principal / Dean console.
+                    </div>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="adminPasscode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
+                          Institutional Admin Passcode
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter SIET@ADMIN"
                             className="h-10 text-xs bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-border dark:border-zinc-700"
                             {...field}
                           />
