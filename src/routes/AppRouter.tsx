@@ -44,8 +44,8 @@ const ProtectedRoute: React.FC<{
     return <Navigate to="/login" replace />;
   }
 
-  // Strictly enforce official institutional domain authorization (@sriniet.edu.in)
-  if (!user.email?.toLowerCase().endsWith("@sriniet.edu.in")) {
+  // Strictly enforce official institutional domain authorization (@sriniet.edu.in) for students
+  if (userData.role === "student" && !user.email?.toLowerCase().endsWith("@sriniet.edu.in")) {
     signOut(auth);
     return <Navigate to="/login" replace />;
   }

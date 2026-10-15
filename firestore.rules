@@ -4,8 +4,7 @@ service cloud.firestore {
     
     function isAuthorized() {
       return request.auth != null && 
-        request.auth.token.email != null &&
-        request.auth.token.email.matches('.*@sriniet[.]edu[.]in$');
+        request.auth.token.email != null;
     }
 
     function getUser() {
@@ -27,7 +26,8 @@ service cloud.firestore {
     // User profile document rules
     match /users/{userId} {
       allow read: if isAuthorized();
-      allow create: if isAuthorized() && request.auth.uid == userId;
+      allow create: if isAuthorized() && request.auth.uid == userId &&
+        (request.resource.data.role != 'student' || request.auth.token.email.matches('.*@sriniet[.]edu[.]in$'));
       allow update: if isAuthorized() && (request.auth.uid == userId || isAdmin() || isHOD());
       allow delete: if isAdmin();
     }

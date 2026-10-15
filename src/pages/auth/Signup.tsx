@@ -108,27 +108,7 @@ const signupSchema = z
         });
       }
     } else {
-      // Faculty & HOD strict institutional email check
-      const cleanEmail = data.email.trim().toLowerCase();
-      if (!cleanEmail.endsWith("@sriniet.edu.in")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Staff must register using official college email (@sriniet.edu.in)",
-          path: ["email"],
-        });
-      }
-      if (
-        cleanEmail.endsWith("@gmail.com") ||
-        cleanEmail.endsWith("@yahoo.com") ||
-        cleanEmail.endsWith("@outlook.com")
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Personal email domains are strictly prohibited for institutional accounts.",
-          path: ["email"],
-        });
-      }
-
+      // Faculty & HOD: Personal or official institutional email is permitted for security & recovery
       if (data.role === "faculty") {
         if (!data.year) {
           ctx.addIssue({
@@ -352,9 +332,17 @@ export default function Signup() {
               Register Academic Account
             </h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Sign up using your official institutional email (
-              <span className="text-siet-primary dark:text-red-400 font-semibold">@sriniet.edu.in</span>
-              ).
+              {selectedRole === "student" ? (
+                <>
+                  Students must register using official college email (
+                  <span className="text-siet-primary dark:text-red-400 font-semibold">@sriniet.edu.in</span>
+                  ).
+                </>
+              ) : (
+                <>
+                  Faculty & HODs may register with personal or institutional email for security notifications.
+                </>
+              )}
             </p>
           </div>
 
@@ -730,12 +718,16 @@ export default function Signup() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase text-muted-foreground">
-                      College Email Address
+                      {selectedRole === "student" ? "College Email Address" : "Email Address (Security & Recovery)"}
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="yourname@sriniet.edu.in"
+                        placeholder={
+                          selectedRole === "student"
+                            ? "256N5A0511@sriniet.edu.in"
+                            : "personal@gmail.com or official@sriniet.edu.in"
+                        }
                         className="h-10 text-xs bg-muted/20 border-border"
                         {...field}
                       />

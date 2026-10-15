@@ -112,15 +112,9 @@ export default function Login() {
         }
         targetEmail = rawIdentifier.toLowerCase();
       } else {
-        // Staff Login: Using Employee ID (e.g., F26AIML0S001) or Administrator Email
+        // Staff Login: Using Employee ID (e.g., F26AIML0S001) or Registered Staff Email
         if (rawIdentifier.includes("@")) {
-          // Support admin / faculty direct college email sign in
-          if (!rawIdentifier.toLowerCase().endsWith("@sriniet.edu.in")) {
-            setError("Staff and administrators must sign in using @sriniet.edu.in institutional email or Employee ID.");
-            toast.error("Invalid domain");
-            setIsLoading(false);
-            return;
-          }
+          // Allow direct authentication using registered personal or institutional email
           targetEmail = rawIdentifier.toLowerCase();
         } else {
           // Resolve Employee ID from staffLookups index
@@ -291,13 +285,13 @@ export default function Login() {
                   placeholder={
                     activePortal === "student"
                       ? "256N5A0511@sriniet.edu.in"
-                      : "e.g. F26AIML0S001"
+                      : "Employee ID (e.g. F26AIML0S001) or Email"
                   }
                   autoComplete={activePortal === "student" ? "email" : "username"}
                   spellCheck={false}
                   {...form.register("identifier")}
                   className={`w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-medium placeholder:text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-siet-primary ${
-                    activePortal === "staff" ? "uppercase tabular-nums tracking-wide" : ""
+                    activePortal === "staff" && !form.watch("identifier")?.includes("@") ? "uppercase tabular-nums tracking-wide" : ""
                   }`}
                 />
               </div>
@@ -432,7 +426,7 @@ export default function Login() {
               </span>
             ) : (
               <span>
-                Faculty and HODs must enter their auto-generated <strong className="text-zinc-800 dark:text-zinc-200">Employee ID</strong> (e.g. F26AIML0S001) or approved staff email.
+                Faculty and HODs sign in with their assigned <strong className="text-zinc-800 dark:text-zinc-200">Employee ID</strong> (e.g. F26AIML0S001) or registered personal/official email.
               </span>
             )}
           </div>
